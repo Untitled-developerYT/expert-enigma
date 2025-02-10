@@ -10,28 +10,77 @@
         overflow: hidden;
     }
 </style>
-  <script src="index_files/liquidfun.js"></script>
+  <script src="water/liquidfun.js"></script>
 
   <!-- testbed code !-->
-  <script src="index_files/renderer.js"></script>
-  <script src="index_files/three.js"></script>
-  <script src="index_files/testbed.js"></script>
-  <script src="index_files/utils.js"></script>
+  <script src="water/renderer.js"></script>
+  <script src="water/three.js"></script>
+  <script src="water/testbed.js"></script>
+  <script src="water/utils.js"></script>
 
   <!-- tests !-->
-  <script src="index_files/testDamBreak.js"></script>
-  <script src="index_files/testDrawingParticles.js"></script>
-  <script src="index_files/testElasticParticles.js"></script>
-  <script src="index_files/testImpulse.js"></script>
-  <script src="index_files/testLiquidTimer.js"></script>
-  <script src="index_files/testParticles.js"></script>
-  <script src="index_files/testRigidParticles.js"></script>
-  <script src="index_files/testSoup.js"></script>
-  <script src="index_files/testSoupStirrer.js"></script>
-  <script src="index_files/testSparky.js"></script>
-  <script src="index_files/testSurfaceTension.js"></script>
-  <script src="index_files/testTheoJansen.js"></script>
-  <script src="index_files/testWaveMachine.js"></script>
+  <script src="water/testDamBreak.js"></script>
+  <script src="water/testDrawingParticles.js"></script>
+  <script src="water/testElasticParticles.js"></script>
+  <script src="water/testImpulse.js"></script>
+  <script src="water/testLiquidTimer.js"></script>
+  <script src="water/testParticles.js"></script>
+  <script src="water/testRigidParticles.js"></script>
+  <script src="water/testSoup.js"></script>
+  <script src="water/testSoupStirrer.js"></script>
+  <script src="water/testSparky.js"></script>
+  <script src="water/testSurfaceTension.js"></script>
+  <script src="water/testTheoJansen.js"></script>
+  <script src="water/testWaveMachine.js"></script>
+  <script src="water/testDominos.js"></script>
+
+
+
+
+
+  <script src="water/testAddPair.js"></script>
+  <script src="water/testAntiPointy.js"></script>
+  <script src="water/testApplyForce.js"></script>
+  <script src="water/testBodyTypes.js"></script>
+  <script src="water/testBridge.js"></script>
+  <script src="water/testBreakable.js"></script>
+  <script src="water/testBullet.js"></script>
+  <script src="water/testCantilever.js"></script>
+  <script src="water/testCar.js"></script>
+  <script src="water/testChain.js"></script>
+  <script src="water/testCharacterCollision.js"></script>
+  <script src="water/testCollisionFiltering.js"></script>
+  <script src="water/testCompoundShapes.js"></script>
+  <script src="water/testConfined.js"></script>
+  <script src="water/testConvexHull.js"></script>
+  <script src="water/testConveyorBelt.js"></script>
+  <script src="water/testCornerCase.js"></script>
+  <script src="water/testDumpShell.js"></script>
+  <script src="water/testEdgeShape.js"></script>
+  <script src="water/testEdgeTest.js"></script>
+  <script src="water/testGears.js"></script>
+  <script src="water/testHw.js"></script>
+  <script src="water/testMaxwell.js"></script>
+  <script src="water/testMobile.js"></script>
+  <script src="water/testMobileBalanced.js"></script>
+  <script src="water/testMotorJoint.js"></script>
+  <script src="water/testPinball.js"></script>
+  <script src="water/testPointy.js"></script>
+  <script src="water/testPrismatic.js"></script>
+  <script src="water/testPulley.js"></script>
+  <script src="water/testPyramid.js"></script>
+  <script src="water/testRamp.js"></script>
+  <script src="water/testRevolute.js"></script>
+  <script src="water/testRopeJoint.js"></script>
+  <script src="water/testSensorTest.js"></script>
+  <script src="water/testShapeEditing.js"></script>
+  <script src="water/testSliderCrank.js"></script>
+  <script src="water/testSphereStack.js"></script>
+  <script src="water/testTiles.js"></script>
+  <script src="water/testVaryingRestitution.js"></script>
+  <script src="water/testVaryingFriction.js"></script>
+  <script src="water/testVerticalStack.js"></script>
+  <script src="water/testWeb.js"></script>
 
   <body onload="initTestbed()"></body>
 
@@ -51,56 +100,58 @@
         <option value="TestSurfaceTension">SurfaceTension</option>
         <option value="TestTheoJansen">Theo Jansen</option>
         <option value="TestWaveMachine" selected="selected">Wave Machine</option>
+        <option value="TestDominos">Dominos</option>
+        <option value="TestAddPair">Add Pair</option>
+        <option value="TestAntiPointy">Anti Pointy</option>
+        <option value="TestApplyForce">Apply Force</option>
+        <option value="TestBodyTypes">Body Types</option>
+        <option value="TestBridge">Bridge</option>
+        <option value="TestBreakable">Breakable</option>
+        <option value="TestBullet">Bullet</option>
+        <option value="TestCantilever">Cantilever</option>
+        <option value="TestCar">Car</option>
+        <option value="TestChain">Chain</option>
+        <option value="TestCharacterCollision">Character Collision</option>
+        <option value="TestCollisionFiltering">Collision Filtering</option>
+        <option value="TestCompoundShapes">Compound Shapes</option>
+        <option value="TestConfined">Confined</option>
+        <option value="TestConvexHull">Convex Hull</option>
+        <option value="TestConveyorBelt">Conveyor Belt</option>
+        <option value="TestCornerCase">Corner Case</option>
+        <option value="TestDumpShell">Dump Shell</option>
+        <option value="TestEdgeShape">Edge Shape</option>
+        <option value="TestEdgeTest">Edge Test</option>
+        <option value="TestGears">Gears</option>
+        <option value="TestHw">Heavy On Light</option>
+        <option value="TestMaxwell">Maxwell</option>
+        <option value="TestMobile">Mobile</option>
+        <option value="TestMobileBalanced">Mobile Balanced</option>
+        <option value="TestMotorJoint">Motor Joint</option>
+        <option value="TestPinball">Pinball</option>
+        <option value="TestPointy">Pointy</option>
+        <option value="TestPrismatic">Prismatic</option>
+        <option value="TestPulley">Pulley</option>
+        <option value="TestPyramid">Pyramid</option>
+        <option value="TestRamp">Ramp</option>
+        <option value="TestRevolute">Revolute</option>
+        <option value="TestRopeJoint">Rope Joint</option>
+        <option value="TestSensorTest">Sensor Test</option>
+        <option value="TestShapeEditing">Shape Editing</option>
+        <option value="TestSliderCrank">Slider Crank</option>
+        <option value="TestSphereStack">Sphere Stack</option>
+        <option value="TestTiles">Tiles</option>
+        <option value="TestVaryingRestitution">Varying Restitution</option>
+        <option value="TestVaryingFriction">Varying Friction</option>
+        <option value="TestVerticalStack">Vertical Stack</option>
+        <option value="TestWeb">Web</option>
+        
       </select>
 
   </div>
 
   <!-- These tests are implemented, but removed since they're not
        related to LiquidFun.
-  <script src="testbed/tests/testAddPair.js"></script>
-  <script src="testbed/tests/testAntiPointy.js"></script>
-  <script src="testbed/tests/testApplyForce.js"></script>
-  <script src="testbed/tests/testBodyTypes.js"></script>
-  <script src="testbed/tests/testBridge.js"></script>
-  <script src="testbed/tests/testBreakable.js"></script>
-  <script src="testbed/tests/testBullet.js"></script>
-  <script src="testbed/tests/testCantilever.js"></script>
-  <script src="testbed/tests/testCar.js"></script>
-  <script src="testbed/tests/testChain.js"></script>
-  <script src="testbed/tests/testCharacterCollision.js"></script>
-  <script src="testbed/tests/testCollisionFiltering.js"></script>
-  <script src="testbed/tests/testCompoundShapes.js"></script>
-  <script src="testbed/tests/testConfined.js"></script>
-  <script src="testbed/tests/testConvexHull.js"></script>
-  <script src="testbed/tests/testConveyorBelt.js"></script>
-  <script src="testbed/tests/testCornerCase.js"></script>
-  <script src="testbed/tests/testDominos.js"></script>
-  <script src="testbed/tests/testDumpShell.js"></script>
-  <script src="testbed/tests/testEdgeShape.js"></script>
-  <script src="testbed/tests/testEdgeTest.js"></script>
-  <script src="testbed/tests/testGears.js"></script>
-  <script src="testbed/tests/testHw.js"></script>
-  <script src="testbed/tests/testMaxwell.js"></script>
-  <script src="testbed/tests/testMobile.js"></script>
-  <script src="testbed/tests/testMobileBalanced.js"></script>
-  <script src="testbed/tests/testMotorJoint.js"></script>
-  <script src="testbed/tests/testPinball.js"></script>
-  <script src="testbed/tests/testPointy.js"></script>
-  <script src="testbed/tests/testPrismatic.js"></script>
-  <script src="testbed/tests/testPulley.js"></script>
-  <script src="testbed/tests/testPyramid.js"></script>
-  <script src="testbed/tests/testRamp.js"></script>
-  <script src="testbed/tests/testRevolute.js"></script>
-  <script src="testbed/tests/testRopeJoint.js"></script>
-  <script src="testbed/tests/testSensorTest.js"></script>
-  <script src="testbed/tests/testShapeEditing.js"></script>
-  <script src="testbed/tests/testSliderCrank.js"></script>
-  <script src="testbed/tests/testSphereStack.js"></script>
-  <script src="testbed/tests/testTiles.js"></script>
-  <script src="testbed/tests/testVaryingRestitution.js"></script>
-  <script src="testbed/tests/testVaryingFriction.js"></script>
-  <script src="testbed/tests/testVerticalStack.js"></script>
-  <script src="testbed/tests/testWeb.js"></script>
+  
   !-->
 
   <!-- These tests have not yet been implemented.
