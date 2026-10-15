@@ -43,7 +43,7 @@ button,input,textarea{font:inherit}button{border:1px solid #35506c;border-radius
 <script>
 'use strict';
 // Manual WebRTC signalling: exchange the offer and answer text between players.
-const rtcConfig={iceServers:[{urls:'stun:stun.l.google.com:19302'}]};
+const rtcConfig={iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'}]};
 const $=id=>document.getElementById(id);
 const canvas=$('canvas'),ctx=canvas.getContext('2d');
 const W=1000,H=600,CELL=50,COLS=W/CELL,ROWS=H/CELL;
@@ -69,10 +69,27 @@ function initPeerConnection(){
 }
 function updateLocalCode(){if(pc?.localDescription)$('localSDP').value=JSON.stringify(pc.localDescription);}
 async function waitForIceGathering(){
-  if(!pc||pc.iceGatheringState==='complete'){updateLocalCode();return;}
-  status('Preparing connection code…');
-  await new Promise((resolve,reject)=>{const timeout=setTimeout(()=>{pc?.removeEventListener('icegatheringstatechange',check);reject(new Error('ICE gathering timed out. Try again.'));},15000);function check(){if(pc?.iceGatheringState==='complete'){clearTimeout(timeout);pc.removeEventListener('icegatheringstatechange',check);resolve();}}pc.addEventListener('icegatheringstatechange',check);});
-  updateLocalCode();status('Code ready. Copy it and send it to your partner.');
+  const peer=pc;
+  if(!peer){throw new Error('Connection setup was reset. Choose Host or Join again.');}
+  if(peer.iceGatheringState==='complete'){
+    updateLocalCode();status('Connection code ready. Copy it and send it to your partner.');return;
+  }
+  status('Gathering network routes… this can take a few seconds.');
+  // Some browsers/networks never report ICE gathering as complete even though
+  // usable candidates have already been collected. Do not discard the offer or
+  // answer in that case: use the best SDP available and warn the player.
+  const completed=await new Promise(resolve=>{
+    let finished=false;
+    const finish=value=>{if(finished)return;finished=true;clearTimeout(timeout);peer.removeEventListener('icegatheringstatechange',check);resolve(value);};
+    const check=()=>{if(peer.iceGatheringState==='complete')finish(true);};
+    const timeout=setTimeout(()=>finish(false),10000);
+    peer.addEventListener('icegatheringstatechange',check);
+    check();
+  });
+  if(pc!==peer){throw new Error('Connection setup was reset. Try again.');}
+  updateLocalCode();
+  if(completed){status('Connection code ready. Copy it and send it to your partner.');}
+  else{status('Timed out waiting for every network route, but a connection code was created. Copy it and try connecting. If it fails, both players should reset and generate fresh codes; different networks may require a TURN relay.');}
 }
 async function startHost(){
  if(roleChosen)return;roleChosen=true;isHost=true;$('hostChoice').classList.add('selected');$('joinChoice').disabled=true;status('Creating host offer…');
