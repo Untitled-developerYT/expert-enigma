@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>P2P Arena & Collaborative Story</title>
+  <title>Co-Op Station Survival & Story</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: #08080c;
+      background: #060609;
       color: #f0f0f5;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       display: flex;
@@ -19,7 +19,7 @@
     h1 {
       margin-bottom: 20px;
       font-size: 2.2rem;
-      background: linear-gradient(45deg, #00ffcc, #ff0066);
+      background: linear-gradient(45deg, #00ffcc, #3399ff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       text-shadow: 0 0 30px rgba(0, 255, 204, 0.3);
@@ -40,7 +40,7 @@
     textarea {
       width: 100%;
       height: 65px;
-      background: #08080c;
+      background: #060609;
       border: 1px solid #2a2a3d;
       color: #00ffcc;
       font-family: monospace;
@@ -57,8 +57,8 @@
       padding: 12px;
       border: none;
       border-radius: 6px;
-      background: linear-gradient(135deg, #00ffcc, #0099ff);
-      color: #08080c;
+      background: linear-gradient(135deg, #00ffcc, #0077ff);
+      color: #060609;
       font-weight: bold;
       font-size: 1rem;
       cursor: pointer;
@@ -78,7 +78,7 @@
     canvas {
       border: 3px solid #1f1f2e;
       border-radius: 10px;
-      background: #0d0d14;
+      background: #0c0c14;
       box-shadow: 0 10px 40px rgba(0,0,0,0.8);
       cursor: crosshair;
     }
@@ -86,8 +86,8 @@
       display: none;
       position: absolute;
       top: 0; left: 0; width: 800px; height: 500px;
-      background: rgba(10, 10, 15, 0.92);
-      backdrop-filter: blur(5px);
+      background: rgba(8, 8, 14, 0.95);
+      backdrop-filter: blur(6px);
       border-radius: 10px;
       flex-direction: column;
       justify-content: center;
@@ -95,16 +95,16 @@
       padding: 40px;
       text-align: center;
       z-index: 10;
-      border: 2px solid #ff0066;
+      border: 2px solid #00ffcc;
     }
-    #storyTitle { color: #ff0066; font-size: 1.5rem; margin-bottom: 15px; font-weight: bold; }
-    #storyText { color: #e0e0f0; font-size: 1.05rem; line-height: 1.6; margin-bottom: 25px; max-width: 650px; }
+    #storyTitle { color: #00ffcc; font-size: 1.5rem; margin-bottom: 15px; font-weight: bold; }
+    #storyText { color: #d0d0e0; font-size: 1.05rem; line-height: 1.6; margin-bottom: 25px; max-width: 650px; }
     .story-btn-group { display: flex; gap: 15px; width: 100%; max-width: 600px; }
     .story-btn {
-      flex: 1; padding: 12px; background: #1f1f2e; border: 1px solid #ff0066; color: white;
+      flex: 1; padding: 12px; background: #161622; border: 1px solid #00ffcc; color: white;
       border-radius: 6px; cursor: pointer; font-weight: bold; transition: background 0.2s;
     }
-    .story-btn:hover { background: #ff0066; }
+    .story-btn:hover { background: #00ffcc; color: #060609; }
     #status {
       margin-top: 12px; font-weight: 600; color: #ffcc00; font-size: 0.95rem; text-align: center;
     }
@@ -117,7 +117,7 @@
 </head>
 <body>
 
-  <h1>🌌 DERELICT PROTOCOL: CO-OP STORY</h1>
+  <h1>🌌 DEEP-SPACE CO-OP SURVIVAL</h1>
 
   <div id="lobby">
     <div class="btn-group">
@@ -143,10 +143,10 @@
   <div id="gameContainer">
     <canvas id="canvas" width="800" height="500"></canvas>
     
-    <!-- Story Event Modal Overlay -->
+    <!-- Co-Op Story Terminal Overlay -->
     <div id="storyOverlay">
-      <div id="storyTitle">⚠️ STATION TERMINAL OVERRIDE</div>
-      <div id="storyText">Loading narrative transmission...</div>
+      <div id="storyTitle">⚠️ STATION EMERGENCY LOG</div>
+      <div id="storyText">Decrypting data transmission...</div>
       <div class="story-btn-group">
         <button class="story-btn" id="choiceA" onclick="makeChoice(0)">Option A</button>
         <button class="story-btn" id="choiceB" onclick="makeChoice(1)">Option B</button>
@@ -155,7 +155,7 @@
 
     <div class="controls-hint">
       Move: <span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span> &nbsp;|&nbsp; 
-      Aim: Mouse &nbsp;|&nbsp; Shoot: Left Click
+      Aim: Mouse &nbsp;|&nbsp; Shoot Drones: Left Click
     </div>
   </div>
 
@@ -265,22 +265,22 @@
     initGame();
   }
 
-  // --- Story Chapters & Narrative Data ---
+  // --- Collaborative Story Chapters ---
   const storyChapters = [
     {
-      title: "SECTOR 4: REACTOR CORRIDOR",
-      text: "You breach the central junction. A flickering mainframe terminal drops from the ceiling, projecting an encrypted emergency log from the station's chief engineer: 'The AI core has locked down life support. To bypass the firewall, we must vent chamber pressure or reroute auxiliary grid power through our suit batteries.'",
+      title: "SECTOR 3: CENTRAL AIRLOCK",
+      text: "You cleared out the initial drone swarm, but the blast doors ahead are locked tight. A terminal blinks with two emergency override protocols left by the station crew.",
       choices: [
-        { text: "Vent Chamber Pressure (Fast, risky defense)", result: "You purge the corridor atmosphere, freezing enemy actuators but draining 15 HP from both suits." },
-        { text: "Reroute Grid Power (Safe, time-consuming)", result: "You successfully bypass the firewall cleanly, restoring 20 shield points." }
+        { text: "Overcharge Airlock Circuits (Heals both players +25 HP)", result: "Circuits spark, repairing suit integrity, but alerting more drones!" },
+        { text: "Reroute to Auxiliary Vent Shaft (Grants radar upgrade)", result: "You slip through quietly, revealing all upcoming drone positions on your HUD." }
       ]
     },
     {
-      title: "SECTOR 7: SUB-LEVEL ARCHIVES",
-      text: "Deep in the databanks, a secondary terminal activates. A visual feed shows a locked escape pod bay ahead, but security defense turrets are spooling up. Do you slice the core memory or download the flight recorder?",
+      title: "SECTOR 6: QUANTUM CORE",
+      text: "The reactor core is pulsating dangerously. The station AI speaks through the intercom: 'Organic lifeforms detected. Surrender your samples or face total core purge.'",
       choices: [
-        { text: "Slice Core Memory (Overload automated drones)", result: "Automated defenses short out across the sector, granting bonus score multipliers!" },
-        { text: "Download Flight Recorder (Uncover corporate sabotage)", result: "You discover the station AI was ordered to quarantine the crew. Morale surges, sharpening your focus." }
+        { text: "Feed False Data to AI (Distracts drones for 10 seconds)", result: "The AI gets confused, temporarily freezing all enemy movement." },
+        { text: "Purge Coolant Lines (Permanently upgrades weapon damage)", result: "Your blasters supercharge with coolant frost, doubling your firepower!" }
       ]
     }
   ];
@@ -296,10 +296,13 @@
 
   let gameState = {
     players: {
-      host:   { x: 150, y: 250, angle: 0, score: 0, color: '#00ffcc', hp: 100 },
-      client: { x: 650, y: 250, angle: 0, score: 0, color: '#ff0066', hp: 100 }
+      host:   { x: 250, y: 250, angle: 0, hp: 100, color: '#00ffcc', damageBoost: 1 },
+      client: { x: 550, y: 250, angle: 0, hp: 100, color: '#3399ff', damageBoost: 1 }
     },
     bullets: [],
+    drones: [],
+    wave: 1,
+    dronesDefeated: 0,
     inStory: false
   };
 
@@ -327,13 +330,17 @@
       if (!gameState.inStory) {
         updateHost({ keys: { ...keys }, angle: aimAngle, shoot: mouse.down });
 
-        // Trigger story milestone every 3 score points combined
-        let totalScore = gameState.players.host.score + gameState.players.client.score;
-        if (totalScore > 0 && totalScore % 3 === 0 && !gameState.storyTriggered) {
+        // Spawn drones if low
+        if (gameState.drones.length < 3 + gameState.wave) {
+          spawnDrone();
+        }
+
+        // Trigger story milestone every 5 drones defeated
+        if (gameState.dronesDefeated > 0 && gameState.dronesDefeated % 5 === 0 && !gameState.storyTriggered) {
           gameState.inStory = true;
           gameState.storyTriggered = true;
           triggerStoryEvent();
-        } else if (totalScore % 3 !== 0) {
+        } else if (gameState.dronesDefeated % 5 !== 0) {
           gameState.storyTriggered = false;
         }
       }
@@ -352,6 +359,17 @@
 
     render();
     requestAnimationFrame(gameLoop);
+  }
+
+  function spawnDrone() {
+    const side = Math.floor(Math.random() * 4);
+    let x, y;
+    if (side === 0) { x = Math.random() * canvas.width; y = -20; }
+    else if (side === 1) { x = Math.random() * canvas.width; y = canvas.height + 20; }
+    else if (side === 2) { x = -20; y = Math.random() * canvas.height; }
+    else { x = canvas.width + 20; y = Math.random() * canvas.height; }
+
+    gameState.drones.push({ x, y, hp: 30, speed: 1.8 });
   }
 
   function triggerStoryEvent() {
@@ -382,14 +400,14 @@
   function resolveStoryChoice(index) {
     gameState.inStory = false;
     currentChapterIndex++;
-    
-    // Apply narrative effects to players
+    gameState.wave++;
+
     if (index === 0) {
-      gameState.players.host.hp = Math.max(10, gameState.players.host.hp - 15);
-      gameState.players.client.hp = Math.max(10, gameState.players.client.hp - 15);
+      gameState.players.host.hp = Math.min(100, gameState.players.host.hp + 25);
+      gameState.players.client.hp = Math.min(100, gameState.players.client.hp + 25);
     } else {
-      gameState.players.host.hp = Math.min(100, gameState.players.host.hp + 20);
-      gameState.players.client.hp = Math.min(100, gameState.players.client.hp + 20);
+      gameState.players.host.damageBoost += 0.5;
+      gameState.players.client.damageBoost += 0.5;
     }
 
     if (dataChannel?.readyState === 'open') {
@@ -405,6 +423,23 @@
     updatePlayerPhysics(gameState.players.client, clientInput.keys || {}, clientInput.angle || 0);
     if (clientInput.shoot) tryShoot('client', gameState.players.client);
 
+    // Update Drones AI (Target nearest player)
+    for (let d of gameState.drones) {
+      let target = Math.hypot(gameState.players.host.x - d.x, gameState.players.host.y - d.y) <
+                   Math.hypot(gameState.players.client.x - d.x, gameState.players.client.y - d.y) ?
+                   gameState.players.host : gameState.players.client;
+
+      let angle = Math.atan2(target.y - d.y, target.x - d.x);
+      d.x += Math.cos(angle) * d.speed;
+      d.y += Math.sin(angle) * d.speed;
+
+      // Check drone collision with players
+      if (Math.hypot(target.x - d.x, target.y - d.y) < 20) {
+        target.hp -= 0.5; // continuous damage
+      }
+    }
+
+    // Update Bullets
     for (let i = gameState.bullets.length - 1; i >= 0; i--) {
       let b = gameState.bullets[i];
       b.x += Math.cos(b.angle) * b.speed;
@@ -416,22 +451,22 @@
         continue;
       }
 
-      for (let id in gameState.players) {
-        if (id !== b.owner) {
-          let p = gameState.players[id];
-          if (Math.hypot(p.x - b.x, p.y - b.y) < 16) {
-            p.hp -= 20;
-            gameState.bullets.splice(i, 1);
-
-            if (p.hp <= 0) {
-              gameState.players[b.owner].score++;
-              p.hp = 100;
-              p.x = id === 'host' ? 150 : 650;
-              p.y = 250;
-            }
-            break;
+      // Check bullets hitting Drones
+      let hitDrone = false;
+      for (let j = gameState.drones.length - 1; j >= 0; j--) {
+        let d = gameState.drones[j];
+        if (Math.hypot(d.x - b.x, d.y - b.y) < 18) {
+          d.hp -= (b.owner === 'host' ? gameState.players.host.damageBoost : gameState.players.client.damageBoost) * 15;
+          hitDrone = true;
+          if (d.hp <= 0) {
+            gameState.drones.splice(j, 1);
+            gameState.dronesDefeated++;
           }
+          break;
         }
+      }
+      if (hitDrone) {
+        gameState.bullets.splice(i, 1);
       }
     }
   }
@@ -453,12 +488,12 @@
 
   function tryShoot(id, p) {
     const now = Date.now();
-    if (!p.lastShot || now - p.lastShot > 250) {
+    if (!p.lastShot || now - p.lastShot > 220) {
       p.lastShot = now;
       gameState.bullets.push({
         x: p.x + Math.cos(p.angle) * 22,
         y: p.y + Math.sin(p.angle) * 22,
-        angle: p.angle, speed: 9, life: 80, owner: id
+        angle: p.angle, speed: 10, life: 70, owner: id
       });
     }
   }
@@ -466,7 +501,8 @@
   function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    ctx.strokeStyle = '#151522';
+    // Background Grid
+    ctx.strokeStyle = '#121220';
     ctx.lineWidth = 1;
     for (let x = 0; x < canvas.width; x += 40) {
       ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
@@ -475,21 +511,39 @@
       ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
     }
 
-    drawHUD('HOST', gameState.players.host, 30, 30);
-    drawHUD('CLIENT', gameState.players.client, canvas.width - 180, 30);
+    // HUD / Status
+    drawHUD('HOST (P1)', gameState.players.host, 30, 25);
+    drawHUD('CLIENT (P2)', gameState.players.client, canvas.width - 180, 25);
 
-    ctx.fillStyle = '#ffcc00';
+    ctx.fillStyle = '#ff3366';
+    ctx.font = 'bold 14px system-ui';
+    ctx.fillText(`Wave: ${gameState.wave} | Drones Destroyed: ${gameState.dronesDefeated}`, canvas.width / 2 - 110, 30);
+
+    // Draw Drones (Enemies)
+    ctx.fillStyle = '#ff3355';
+    for (let d of gameState.drones) {
+      ctx.beginPath();
+      ctx.arc(d.x, d.y, 12, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.lineWidth = 2;
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
+    }
+
+    // Draw Bullets
+    ctx.fillStyle = '#ffff00';
     for (let b of gameState.bullets) {
       ctx.beginPath(); ctx.arc(b.x, b.y, 4, 0, Math.PI * 2); ctx.fill();
     }
 
+    // Draw Players (Co-Op Teammates)
     for (let id in gameState.players) {
       let p = gameState.players[id];
       ctx.save();
       ctx.translate(p.x, p.y);
       ctx.rotate(p.angle);
       ctx.fillStyle = '#ffffff'; ctx.fillRect(0, -3, 22, 6);
-      ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(0, 0, 15, 0, Math.PI * 2); ctx.fill();
       ctx.lineWidth = 3; ctx.strokeStyle = '#ffffff'; ctx.stroke();
       ctx.restore();
     }
@@ -497,10 +551,11 @@
 
   function drawHUD(label, player, x, y) {
     ctx.fillStyle = '#a0a0b0';
-    ctx.font = 'bold 12px system-ui';
-    ctx.fillText(`${label} - Score: ${player.score}`, x, y);
-    ctx.strokeStyle = '#33334d'; ctx.lineWidth = 2; ctx.strokeRect(x, y + 6, 150, 12);
-    ctx.fillStyle = player.color; ctx.fillRect(x, y + 6, 150 * (Math.max(0, player.hp) / 100), 12);
+    ctx.font = 'bold 11px system-ui';
+    ctx.fillText(label, x, y);
+    ctx.strokeStyle = '#33334d'; ctx.lineWidth = 2; ctx.strokeRect(x, y + 4, 150, 10);
+    ctx.fillStyle = player.hp > 30 ? '#00ffcc' : '#ff3333';
+    ctx.fillRect(x, y + 4, 150 * (Math.max(0, player.hp) / 100), 10);
   }
 </script>
 </body>
