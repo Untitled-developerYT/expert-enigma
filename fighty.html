@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Co-Op Station Survival & Story</title>
+  <title>Top-Down WebRTC Arena Shooter</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: #060609;
+      background: #08080c;
       color: #f0f0f5;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       display: flex;
@@ -19,7 +19,7 @@
     h1 {
       margin-bottom: 20px;
       font-size: 2.2rem;
-      background: linear-gradient(45deg, #00ffcc, #3399ff);
+      background: linear-gradient(45deg, #00ffcc, #0088ff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       text-shadow: 0 0 30px rgba(0, 255, 204, 0.3);
@@ -40,7 +40,7 @@
     textarea {
       width: 100%;
       height: 65px;
-      background: #060609;
+      background: #08080c;
       border: 1px solid #2a2a3d;
       color: #00ffcc;
       font-family: monospace;
@@ -57,8 +57,8 @@
       padding: 12px;
       border: none;
       border-radius: 6px;
-      background: linear-gradient(135deg, #00ffcc, #0077ff);
-      color: #060609;
+      background: linear-gradient(135deg, #00ffcc, #0099ff);
+      color: #08080c;
       font-weight: bold;
       font-size: 1rem;
       cursor: pointer;
@@ -73,68 +73,54 @@
       display: none;
       flex-direction: column;
       align-items: center;
-      position: relative;
     }
     canvas {
       border: 3px solid #1f1f2e;
       border-radius: 10px;
-      background: #0c0c14;
+      background: #0d0d14;
       box-shadow: 0 10px 40px rgba(0,0,0,0.8);
       cursor: crosshair;
     }
-    #storyOverlay {
-      display: none;
-      position: absolute;
-      top: 0; left: 0; width: 800px; height: 500px;
-      background: rgba(8, 8, 14, 0.95);
-      backdrop-filter: blur(6px);
-      border-radius: 10px;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      padding: 40px;
-      text-align: center;
-      z-index: 10;
-      border: 2px solid #00ffcc;
-    }
-    #storyTitle { color: #00ffcc; font-size: 1.5rem; margin-bottom: 15px; font-weight: bold; }
-    #storyText { color: #d0d0e0; font-size: 1.05rem; line-height: 1.6; margin-bottom: 25px; max-width: 650px; }
-    .story-btn-group { display: flex; gap: 15px; width: 100%; max-width: 600px; }
-    .story-btn {
-      flex: 1; padding: 12px; background: #161622; border: 1px solid #00ffcc; color: white;
-      border-radius: 6px; cursor: pointer; font-weight: bold; transition: background 0.2s;
-    }
-    .story-btn:hover { background: #00ffcc; color: #060609; }
     #status {
-      margin-top: 12px; font-weight: 600; color: #ffcc00; font-size: 0.95rem; text-align: center;
+      margin-top: 12px;
+      font-weight: 600;
+      color: #ffcc00;
+      font-size: 0.95rem;
+      text-align: center;
     }
     .controls-hint {
-      margin-top: 15px; font-size: 0.85rem; color: #888899; text-align: center;
-      background: #12121c; padding: 10px 20px; border-radius: 6px; border: 1px solid #1f1f2e;
+      margin-top: 15px;
+      font-size: 0.85rem;
+      color: #888899;
+      text-align: center;
+      background: #12121c;
+      padding: 10px 20px;
+      border-radius: 6px;
+      border: 1px solid #1f1f2e;
     }
     .key { background: #1c1c2b; color: #00ffcc; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-weight: bold; }
   </style>
 </head>
 <body>
 
-  <h1>🌌 DEEP-SPACE CO-OP SURVIVAL</h1>
+  <h1>🎯 P2P TOP-DOWN ARENA</h1>
 
   <div id="lobby">
     <div class="btn-group">
-      <button id="btnHost" onclick="startHost()">1. Host Mission</button>
-      <button id="btnJoin" onclick="startJoin()">1. Join Mission</button>
+      <button id="btnHost" onclick="startHost()">1. Host Game</button>
+      <button id="btnJoin" onclick="startJoin()">1. Join Game</button>
     </div>
 
     <div class="step">
-      <label>Step 2: Copy your connection code and send it to your partner:</label>
+      <label>Step 2: Copy your connection code and send it to your peer:</label>
       <textarea id="localSDP" readonly placeholder="Click Host or Join above..."></textarea>
       <button class="sub-btn" onclick="copySDP()">Copy Code</button>
     </div>
 
     <div class="step">
-      <label>Step 3: Paste your partner's code here and click Connect:</label>
-      <textarea id="remoteSDP" placeholder="Paste partner code here..."></textarea>
-      <button id="btnAccept" class="sub-btn" onclick="acceptRemoteSDP()">Connect Code</button>
+      <label>Step 3: Paste your peer's code here and click Connect:</label>
+      <textarea id="remoteSDP" placeholder="Paste peer code here..."></textarea>
+      <button id="btnAccept" class="sub-btn" onclick="acceptRemoteSDP()">Connect Peer Code</button>
     </div>
 
     <div id="status">Status: Ready. Choose Host or Join.</div>
@@ -142,25 +128,14 @@
 
   <div id="gameContainer">
     <canvas id="canvas" width="800" height="500"></canvas>
-    
-    <!-- Co-Op Story Terminal Overlay -->
-    <div id="storyOverlay">
-      <div id="storyTitle">⚠️ STATION EMERGENCY LOG</div>
-      <div id="storyText">Decrypting data transmission...</div>
-      <div class="story-btn-group">
-        <button class="story-btn" id="choiceA" onclick="makeChoice(0)">Option A</button>
-        <button class="story-btn" id="choiceB" onclick="makeChoice(1)">Option B</button>
-      </div>
-    </div>
-
     <div class="controls-hint">
       Move: <span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span> &nbsp;|&nbsp; 
-      Aim: Mouse &nbsp;|&nbsp; Shoot Drones: Left Click
+      Aim: Mouse &nbsp;|&nbsp; Shoot: Left Click
     </div>
   </div>
 
 <script>
-  // --- WebRTC Signaling ---
+  // --- Bulletproof WebRTC Signaling ---
   const config = { iceServers: [{ urls: "stun:stun.l.google.com:19020" }] };
   let pc, dataChannel;
   let isHost = false;
@@ -190,7 +165,7 @@
   async function startHost() {
     isHost = true;
     document.getElementById('btnJoin').disabled = true;
-    statusEl.innerText = "Status: Hosting mission... Generating code.";
+    statusEl.innerText = "Status: Hosting... Generating offer code.";
     initPeerConnection();
 
     dataChannel = pc.createDataChannel("gameData");
@@ -204,7 +179,7 @@
   async function startJoin() {
     isHost = false;
     document.getElementById('btnHost').disabled = true;
-    statusEl.innerText = "Status: Joining mission... Paste Host code below.";
+    statusEl.innerText = "Status: Joining... Paste Host code below.";
     initPeerConnection();
 
     pc.ondatachannel = (e) => {
@@ -215,7 +190,7 @@
 
   async function acceptRemoteSDP() {
     const rawSDP = remoteSDPEl.value.trim();
-    if (!rawSDP) return alert("Please paste a valid code first!");
+    if (!rawSDP) return alert("Please paste a valid peer code first!");
 
     try {
       const desc = new RTCSessionDescription(JSON.parse(rawSDP));
@@ -225,12 +200,13 @@
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
         localSDPEl.value = JSON.stringify(pc.localDescription);
-        statusEl.innerText = "Status: Answer generated! Copy back to Host.";
+        statusEl.innerText = "Status: Answer generated! Copy your code back to the Host.";
       } else {
-        statusEl.innerText = "Status: Processing partner connection...";
+        statusEl.innerText = "Status: Processing peer answer... Establishing connection.";
       }
     } catch (err) {
-      alert("Invalid code format!");
+      console.error(err);
+      alert("Invalid code format! Make sure you copied the entire block.");
     }
   }
 
@@ -240,14 +216,8 @@
       const msg = JSON.parse(e.data);
       if (isHost && msg.type === 'input') {
         clientInput = msg.data;
-      } else if (isHost && msg.type === 'storyChoice') {
-        resolveStoryChoice(msg.choiceIndex);
       } else if (!isHost && msg.type === 'state') {
         gameState = msg.state;
-      } else if (!isHost && msg.type === 'triggerStory') {
-        showStoryNode(msg.node);
-      } else if (!isHost && msg.type === 'closeStory') {
-        document.getElementById('storyOverlay').style.display = 'none';
       }
     };
   }
@@ -259,34 +229,13 @@
   }
 
   function launchGame() {
-    statusEl.innerText = "Status: Connected! Launching mission...";
+    statusEl.innerText = "Status: Connected! Launching arena...";
     document.getElementById('lobby').style.display = 'none';
     document.getElementById('gameContainer').style.display = 'flex';
     initGame();
   }
 
-  // --- Collaborative Story Chapters ---
-  const storyChapters = [
-    {
-      title: "SECTOR 3: CENTRAL AIRLOCK",
-      text: "You cleared out the initial drone swarm, but the blast doors ahead are locked tight. A terminal blinks with two emergency override protocols left by the station crew.",
-      choices: [
-        { text: "Overcharge Airlock Circuits (Heals both players +25 HP)", result: "Circuits spark, repairing suit integrity, but alerting more drones!" },
-        { text: "Reroute to Auxiliary Vent Shaft (Grants radar upgrade)", result: "You slip through quietly, revealing all upcoming drone positions on your HUD." }
-      ]
-    },
-    {
-      title: "SECTOR 6: QUANTUM CORE",
-      text: "The reactor core is pulsating dangerously. The station AI speaks through the intercom: 'Organic lifeforms detected. Surrender your samples or face total core purge.'",
-      choices: [
-        { text: "Feed False Data to AI (Distracts drones for 10 seconds)", result: "The AI gets confused, temporarily freezing all enemy movement." },
-        { text: "Purge Coolant Lines (Permanently upgrades weapon damage)", result: "Your blasters supercharge with coolant frost, doubling your firepower!" }
-      ]
-    }
-  ];
-  let currentChapterIndex = 0;
-
-  // --- Game Engine State ---
+  // --- Top-Down Game Engine ---
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
 
@@ -296,14 +245,10 @@
 
   let gameState = {
     players: {
-      host:   { x: 250, y: 250, angle: 0, hp: 100, color: '#00ffcc', damageBoost: 1 },
-      client: { x: 550, y: 250, angle: 0, hp: 100, color: '#3399ff', damageBoost: 1 }
+      host:   { x: 150, y: 250, angle: 0, score: 0, color: '#00ffcc', hp: 100 },
+      client: { x: 650, y: 250, angle: 0, score: 0, color: '#ff0066', hp: 100 }
     },
-    bullets: [],
-    drones: [],
-    wave: 1,
-    dronesDefeated: 0,
-    inStory: false
+    bullets: []
   };
 
   window.addEventListener('keydown', e => keys[e.code] = true);
@@ -327,29 +272,13 @@
     let aimAngle = Math.atan2(dy, dx);
 
     if (isHost) {
-      if (!gameState.inStory) {
-        updateHost({ keys: { ...keys }, angle: aimAngle, shoot: mouse.down });
-
-        // Spawn drones if low
-        if (gameState.drones.length < 3 + gameState.wave) {
-          spawnDrone();
-        }
-
-        // Trigger story milestone every 5 drones defeated
-        if (gameState.dronesDefeated > 0 && gameState.dronesDefeated % 5 === 0 && !gameState.storyTriggered) {
-          gameState.inStory = true;
-          gameState.storyTriggered = true;
-          triggerStoryEvent();
-        } else if (gameState.dronesDefeated % 5 !== 0) {
-          gameState.storyTriggered = false;
-        }
-      }
+      updateHost({ keys: { ...keys }, angle: aimAngle, shoot: mouse.down });
 
       if (dataChannel?.readyState === 'open') {
         dataChannel.send(JSON.stringify({ type: 'state', state: gameState }));
       }
     } else {
-      if (dataChannel?.readyState === 'open' && !gameState.inStory) {
+      if (dataChannel?.readyState === 'open') {
         dataChannel.send(JSON.stringify({
           type: 'input',
           data: { keys: { ...keys }, angle: aimAngle, shoot: mouse.down }
@@ -361,85 +290,17 @@
     requestAnimationFrame(gameLoop);
   }
 
-  function spawnDrone() {
-    const side = Math.floor(Math.random() * 4);
-    let x, y;
-    if (side === 0) { x = Math.random() * canvas.width; y = -20; }
-    else if (side === 1) { x = Math.random() * canvas.width; y = canvas.height + 20; }
-    else if (side === 2) { x = -20; y = Math.random() * canvas.height; }
-    else { x = canvas.width + 20; y = Math.random() * canvas.height; }
-
-    gameState.drones.push({ x, y, hp: 30, speed: 1.8 });
-  }
-
-  function triggerStoryEvent() {
-    const chapter = storyChapters[currentChapterIndex % storyChapters.length];
-    showStoryNode(chapter);
-    if (dataChannel?.readyState === 'open') {
-      dataChannel.send(JSON.stringify({ type: 'triggerStory', node: chapter }));
-    }
-  }
-
-  function showStoryNode(node) {
-    document.getElementById('storyTitle').innerText = node.title;
-    document.getElementById('storyText').innerText = node.text;
-    document.getElementById('choiceA').innerText = node.choices[0].text;
-    document.getElementById('choiceB').innerText = node.choices[1].text;
-    document.getElementById('storyOverlay').style.display = 'flex';
-  }
-
-  function makeChoice(index) {
-    document.getElementById('storyOverlay').style.display = 'none';
-    if (isHost) {
-      resolveStoryChoice(index);
-    } else if (dataChannel?.readyState === 'open') {
-      dataChannel.send(JSON.stringify({ type: 'storyChoice', choiceIndex: index }));
-    }
-  }
-
-  function resolveStoryChoice(index) {
-    gameState.inStory = false;
-    currentChapterIndex++;
-    gameState.wave++;
-
-    if (index === 0) {
-      gameState.players.host.hp = Math.min(100, gameState.players.host.hp + 25);
-      gameState.players.client.hp = Math.min(100, gameState.players.client.hp + 25);
-    } else {
-      gameState.players.host.damageBoost += 0.5;
-      gameState.players.client.damageBoost += 0.5;
-    }
-
-    if (dataChannel?.readyState === 'open') {
-      dataChannel.send(JSON.stringify({ type: 'closeStory' }));
-      dataChannel.send(JSON.stringify({ type: 'state', state: gameState }));
-    }
-  }
-
   function updateHost(hostInput) {
     updatePlayerPhysics(gameState.players.host, hostInput.keys, hostInput.angle);
-    if (hostInput.shoot) tryShoot('host', gameState.players.host);
-
-    updatePlayerPhysics(gameState.players.client, clientInput.keys || {}, clientInput.angle || 0);
-    if (clientInput.shoot) tryShoot('client', gameState.players.client);
-
-    // Update Drones AI (Target nearest player)
-    for (let d of gameState.drones) {
-      let target = Math.hypot(gameState.players.host.x - d.x, gameState.players.host.y - d.y) <
-                   Math.hypot(gameState.players.client.x - d.x, gameState.players.client.y - d.y) ?
-                   gameState.players.host : gameState.players.client;
-
-      let angle = Math.atan2(target.y - d.y, target.x - d.x);
-      d.x += Math.cos(angle) * d.speed;
-      d.y += Math.sin(angle) * d.speed;
-
-      // Check drone collision with players
-      if (Math.hypot(target.x - d.x, target.y - d.y) < 20) {
-        target.hp -= 0.5; // continuous damage
-      }
+    if (hostInput.shoot) {
+      tryShoot('host', gameState.players.host);
     }
 
-    // Update Bullets
+    updatePlayerPhysics(gameState.players.client, clientInput.keys || {}, clientInput.angle || 0);
+    if (clientInput.shoot) {
+      tryShoot('client', gameState.players.client);
+    }
+
     for (let i = gameState.bullets.length - 1; i >= 0; i--) {
       let b = gameState.bullets[i];
       b.x += Math.cos(b.angle) * b.speed;
@@ -451,22 +312,23 @@
         continue;
       }
 
-      // Check bullets hitting Drones
-      let hitDrone = false;
-      for (let j = gameState.drones.length - 1; j >= 0; j--) {
-        let d = gameState.drones[j];
-        if (Math.hypot(d.x - b.x, d.y - b.y) < 18) {
-          d.hp -= (b.owner === 'host' ? gameState.players.host.damageBoost : gameState.players.client.damageBoost) * 15;
-          hitDrone = true;
-          if (d.hp <= 0) {
-            gameState.drones.splice(j, 1);
-            gameState.dronesDefeated++;
+      for (let id in gameState.players) {
+        if (id !== b.owner) {
+          let p = gameState.players[id];
+          let dist = Math.hypot(p.x - b.x, p.y - b.y);
+          if (dist < 16) {
+            p.hp -= 15;
+            gameState.bullets.splice(i, 1);
+
+            if (p.hp <= 0) {
+              gameState.players[b.owner].score++;
+              p.hp = 100;
+              p.x = id === 'host' ? 150 : 650;
+              p.y = 250;
+            }
+            break;
           }
-          break;
         }
-      }
-      if (hitDrone) {
-        gameState.bullets.splice(i, 1);
       }
     }
   }
@@ -481,19 +343,24 @@
     if (pKeys['KeyA'] || pKeys['ArrowLeft']) vx -= speed;
     if (pKeys['KeyD'] || pKeys['ArrowRight']) vx += speed;
 
-    p.x += vx; p.y += vy;
+    p.x += vx;
+    p.y += vy;
+
     p.x = Math.max(20, Math.min(canvas.width - 20, p.x));
     p.y = Math.max(20, Math.min(canvas.height - 20, p.y));
   }
 
   function tryShoot(id, p) {
     const now = Date.now();
-    if (!p.lastShot || now - p.lastShot > 220) {
+    if (!p.lastShot || now - p.lastShot > 250) {
       p.lastShot = now;
       gameState.bullets.push({
         x: p.x + Math.cos(p.angle) * 22,
         y: p.y + Math.sin(p.angle) * 22,
-        angle: p.angle, speed: 10, life: 70, owner: id
+        angle: p.angle,
+        speed: 9,
+        life: 80,
+        owner: id
       });
     }
   }
@@ -501,8 +368,7 @@
   function render() {
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Background Grid
-    ctx.strokeStyle = '#121220';
+    ctx.strokeStyle = '#151522';
     ctx.lineWidth = 1;
     for (let x = 0; x < canvas.width; x += 40) {
       ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
@@ -511,51 +377,48 @@
       ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
     }
 
-    // HUD / Status
-    drawHUD('HOST (P1)', gameState.players.host, 30, 25);
-    drawHUD('CLIENT (P2)', gameState.players.client, canvas.width - 180, 25);
+    drawHUD('HOST', gameState.players.host, 30, 30);
+    drawHUD('CLIENT', gameState.players.client, canvas.width - 180, 30);
 
-    ctx.fillStyle = '#ff3366';
-    ctx.font = 'bold 14px system-ui';
-    ctx.fillText(`Wave: ${gameState.wave} | Drones Destroyed: ${gameState.dronesDefeated}`, canvas.width / 2 - 110, 30);
-
-    // Draw Drones (Enemies)
-    ctx.fillStyle = '#ff3355';
-    for (let d of gameState.drones) {
-      ctx.beginPath();
-      ctx.arc(d.x, d.y, 12, 0, Math.PI * 2);
-      ctx.fill();
-      ctx.lineWidth = 2;
-      ctx.strokeStyle = '#ffffff';
-      ctx.stroke();
-    }
-
-    // Draw Bullets
-    ctx.fillStyle = '#ffff00';
+    ctx.fillStyle = '#ffcc00';
     for (let b of gameState.bullets) {
-      ctx.beginPath(); ctx.arc(b.x, b.y, 4, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, 4, 0, Math.PI * 2);
+      ctx.fill();
     }
 
-    // Draw Players (Co-Op Teammates)
     for (let id in gameState.players) {
       let p = gameState.players[id];
       ctx.save();
       ctx.translate(p.x, p.y);
       ctx.rotate(p.angle);
-      ctx.fillStyle = '#ffffff'; ctx.fillRect(0, -3, 22, 6);
-      ctx.fillStyle = p.color; ctx.beginPath(); ctx.arc(0, 0, 15, 0, Math.PI * 2); ctx.fill();
-      ctx.lineWidth = 3; ctx.strokeStyle = '#ffffff'; ctx.stroke();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, -3, 22, 6);
+
+      ctx.fillStyle = p.color;
+      ctx.beginPath();
+      ctx.arc(0, 0, 16, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
+
       ctx.restore();
     }
   }
 
   function drawHUD(label, player, x, y) {
     ctx.fillStyle = '#a0a0b0';
-    ctx.font = 'bold 11px system-ui';
-    ctx.fillText(label, x, y);
-    ctx.strokeStyle = '#33334d'; ctx.lineWidth = 2; ctx.strokeRect(x, y + 4, 150, 10);
-    ctx.fillStyle = player.hp > 30 ? '#00ffcc' : '#ff3333';
-    ctx.fillRect(x, y + 4, 150 * (Math.max(0, player.hp) / 100), 10);
+    ctx.font = 'bold 12px system-ui';
+    ctx.fillText(`${label} - Score: ${player.score}`, x, y);
+
+    ctx.strokeStyle = '#33334d';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, y + 6, 150, 12);
+
+    ctx.fillStyle = player.color;
+    ctx.fillRect(x, y + 6, 150 * (Math.max(0, player.hp) / 100), 12);
   }
 </script>
 </body>
