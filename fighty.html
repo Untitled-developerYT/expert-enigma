@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Gridwatch: co-op tower defence</title>
+<title>Gridwatch: walls</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
 <style>
@@ -44,7 +44,7 @@ textarea{width:100%;min-height:84px;resize:vertical;background:var(--sheet);bord
 .bar{height:5px;background:var(--rule);margin-top:3px}.bar span{display:block;height:100%;width:100%;background:var(--teal);transition:width .2s}
 .layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:16px;align-items:start}
 .board{border:2px solid var(--ink);background:var(--paper);line-height:0}
-canvas{width:100%;height:auto;aspect-ratio:5/3;display:block;cursor:crosshair;touch-action:manipulation}
+canvas{width:100%;height:auto;aspect-ratio:12/7;display:block;cursor:crosshair;touch-action:manipulation}
 .hint{margin:9px 0 0;color:var(--mute);font-size:.9rem;min-height:1.4em}
 .btns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
 .side h3{font-size:1.15rem;border-bottom:1.5px solid var(--ink);padding-bottom:3px;margin:0 0 8px}.side h3:not(:first-child){margin-top:20px}
@@ -61,13 +61,13 @@ canvas{width:100%;height:auto;aspect-ratio:5/3;display:block;cursor:crosshair;to
 </head>
 <body>
 <div class="wrap">
-<header class="top"><div><h1>Gridwatch</h1><p>Two players hold one core. No server, no account.</p></div><div class="conn" id="conn"><i></i><span id="connText">Not connected</span></div></header>
+<header class="top"><div><h1>Gridwatch</h1><p>Two kingdoms, one map. Gather, wall in, break through.</p></div><div class="conn" id="conn"><i></i><span id="connText">Not connected</span></div></header>
 
 <section class="lobby" id="lobby">
-  <h2>Start a defence</h2>
-  <p>One of you hosts and runs the simulation. You connect by trading two short codes over any chat app.</p>
+  <h2>Start a match</h2>
+  <p>One of you hosts and runs the match (blue, left side). The other joins as orange. You connect by trading two short codes over any chat app.</p>
   <div class="roles">
-    <button class="role" id="hostBtn" onclick="startRole(true)"><strong>Host</strong><span>Create the room. You send the first code.</span></button>
+    <button class="role" id="hostBtn" onclick="startRole(true)"><strong>Host</strong><span>Create the match. You send the first code.</span></button>
     <button class="role" id="joinBtn" onclick="startRole(false)"><strong>Join</strong><span>Paste the host's code, then send your reply back.</span></button>
   </div>
   <div class="flow">
@@ -78,27 +78,29 @@ canvas{width:100%;height:auto;aspect-ratio:5/3;display:block;cursor:crosshair;to
 </section>
 
 <section class="game" id="game">
-  <div class="banner" id="banner" hidden><span>Your partner has disconnected.</span><button onclick="resetConnection()">Back to lobby</button></div>
+  <div class="banner" id="banner" hidden><span>Your opponent has disconnected.</span><button onclick="resetConnection()">Back to lobby</button></div>
   <div class="titleblock">
-    <div><small>Credits</small><b id="goldStat">150</b></div>
-    <div><small>Core</small><b id="hpStat">100</b><div class="bar"><span id="hpBar"></span></div></div>
-    <div><small>Wave</small><b id="waveStat">0</b></div>
-    <div><small>Defeated</small><b id="killsStat">0</b></div>
+    <div><small>Wood</small><b id="woodStat">0</b></div>
+    <div><small>Stone</small><b id="stoneStat">0</b></div>
+    <div><small>Your keep</small><b id="hpStat">150</b><div class="bar"><span id="hpBar"></span></div></div>
+    <div><small>Enemy keep</small><b id="enStat">150</b></div>
   </div>
   <div class="layout">
     <main>
-      <div class="board"><canvas id="canvas" width="1000" height="600" aria-label="Tower defence grid. Click an empty square to build."></canvas></div>
+      <div class="board"><canvas id="canvas" width="960" height="560" aria-label="Battlefield grid. Click a square to build or to send a worker to a resource."></canvas></div>
       <p class="hint" id="hint"></p>
-      <div class="btns"><button class="go" id="waveBtn" onclick="requestWave()">Start wave</button><button class="warn" onclick="requestRestart()">Restart match</button></div>
     </main>
     <aside class="side">
-      <h3>Towers</h3>
-      <button class="tower on" data-t="arrow" onclick="setTool('arrow')"><svg viewBox="0 0 30 30"><path d="M15 4 26 25H4Z" fill="none" stroke="#1b2a25" stroke-width="2.5"/></svg><span><strong>Arrow</strong><small>Fast, one target</small></span><span>50 <kbd>1</kbd></span></button>
-      <button class="tower" data-t="cannon" onclick="setTool('cannon')"><svg viewBox="0 0 30 30"><rect x="5" y="5" width="20" height="20" fill="none" stroke="#2b49a3" stroke-width="2.5"/></svg><span><strong>Cannon</strong><small>Slow, hits hard, long reach</small></span><span>100 <kbd>2</kbd></span></button>
-      <button class="tower" data-t="frost" onclick="setTool('frost')"><svg viewBox="0 0 30 30"><path d="M15 3 27 15 15 27 3 15Z" fill="none" stroke="#1d7f7f" stroke-width="2.5"/></svg><span><strong>Frost</strong><small>Slows what it hits</small></span><span>75 <kbd>3</kbd></span></button>
-      <div class="insp" id="insp" hidden><span id="inspText"></span><div class="row"><button class="warn" id="sellBtn" onclick="sellSelected()"></button></div></div>
-      <h3>Field log</h3><div class="log" id="log"><div>Core online. Build, then start wave 1.</div></div>
-      <h3>Rules</h3><p class="hint">Enemies come from every edge toward the core. Each kill pays 15 credits and credits are shared. Click a built tower to sell it for 60% back. Keys: 1 to 3 pick a tower, W starts a wave, Esc clears.</p>
+      <h3>Build</h3>
+      <button class="tower on" data-t="wall" onclick="setTool('wall')"><svg viewBox="0 0 30 30"><rect x="5" y="8" width="20" height="14" fill="none" stroke="#1b2a25" stroke-width="2.5"/><path d="M5 15H25M15 8V15M10 15V22M20 15V22" stroke="#1b2a25" stroke-width="2"/></svg><span><strong>Wood wall</strong><small>50 strength</small></span><span>2 wood <kbd>1</kbd></span></button>
+      <button class="tower" data-t="stone" onclick="setTool('stone')"><svg viewBox="0 0 30 30"><rect x="5" y="5" width="20" height="20" fill="#1b2a25" stroke="#1b2a25" stroke-width="2.5"/></svg><span><strong>Stone wall</strong><small>140. Click a wood wall to upgrade</small></span><span>3 stone <kbd>2</kbd></span></button>
+      <button class="tower" data-t="gather" onclick="setTool('gather')"><svg viewBox="0 0 30 30"><circle cx="15" cy="15" r="9" fill="none" stroke="#1d7f7f" stroke-width="2.5"/><circle cx="15" cy="15" r="2" fill="#1d7f7f"/></svg><span><strong>Gather</strong><small>Click a tree or rock</small></span><span><kbd>3</kbd></span></button>
+      <h3>Grow and attack</h3>
+      <button class="tower" onclick="act({k:'hire'})"><svg viewBox="0 0 30 30"><circle cx="15" cy="10" r="5" fill="none" stroke="#1b2a25" stroke-width="2.5"/><path d="M6 26C6 18 24 18 24 26" fill="none" stroke="#1b2a25" stroke-width="2.5"/></svg><span><strong>Hire worker</strong><small>Up to 8</small></span><span>6 wood <kbd>H</kbd></span></button>
+      <button class="tower" onclick="act({k:'raid'})"><svg viewBox="0 0 30 30"><path d="M15 4 26 25H4Z" fill="#d9531e" stroke="#1b2a25" stroke-width="2"/></svg><span><strong>Send raiders</strong><small>Three at once. They break walls</small></span><span>6 wood <kbd>R</kbd></span></button>
+      <h3>Field log</h3><div class="log" id="log"><div>Match ready.</div></div>
+      <h3>Rules</h3><p class="hint">Workers carry wood and stone home on their own. You can only build next to your keep or your own walls, so walls are how your land grows. Raiders walk the cheapest path to the enemy keep and chew through whatever blocks it. Keeps shoot raiders nearby. Destroy the other keep to win.</p>
+      <div class="btns"><button class="warn" onclick="act({k:'restart'})">New map</button></div>
     </aside>
   </div>
 </section>
@@ -109,20 +111,16 @@ canvas{width:100%;height:auto;aspect-ratio:5/3;display:block;cursor:crosshair;to
 const ICE=[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302']},{urls:'stun:stun.cloudflare.com:3478'}];
 const $=id=>document.getElementById(id);
 const canvas=$('canvas'),ctx=canvas.getContext('2d');
-const W=1000,H=600,CELL=50,COLS=20,ROWS=12;
-const TOWERS={
- arrow:{name:'Arrow',cost:50,range:155,rate:540,damage:22,speed:10,color:'#1b2a25'},
- cannon:{name:'Cannon',cost:100,range:225,rate:1250,damage:72,speed:6,color:'#2b49a3'},
- frost:{name:'Frost',cost:75,range:165,rate:850,damage:10,speed:8,color:'#1d7f7f'}};
-let pc=null,channel=null,openedOn=null,isHost=false,roleChosen=false,started=false,tool='arrow',insp=null,hover=null,lastFrame=0,lastSnap=0,lastHud=0;
-let state=makeState();const disp=new Map();
-
-function makeState(){return{gold:150,coreHp:100,maxCoreHp:100,wave:0,kills:0,towers:[],enemies:[],shots:[],waveActive:false,gameOver:false,spawnLeft:0,spawnTimer:0,nextEnemyId:1};}
+const COLS=24,ROWS=14,CELL=40,W=COLS*CELL,H=ROWS*CELL,PC=['#2b49a3','#d9531e'],DIRS=[[1,0],[-1,0],[0,1],[0,-1]];
+const WATER=new Uint8Array(COLS*ROWS),disp=new Map();
+let pc=null,channel=null,openedOn=null,isHost=false,roleChosen=false,started=false,tool='wall',hover=null,state=null,curSeed=null,fields=[],dirty=true,lastField=0,lastFrame=0,lastSnap=0,lastHud=0;
+const me=()=>isHost?0:1;
 function status(m){$('status').textContent=m;}
-function setConn(text,cls){$('connText').textContent=text;$('conn').className='conn '+(cls||'');}
-function log(text,share=true){const d=document.createElement('div');d.textContent=text;$('log').prepend(d);while($('log').children.length>6)$('log').lastElementChild.remove();if(share&&isHost)send({type:'log',text});}
+function setConn(t,c){$('connText').textContent=t;$('conn').className='conn '+(c||'');}
+function log(t){const d=document.createElement('div');d.textContent=t;$('log').prepend(d);while($('log').children.length>6)$('log').lastElementChild.remove();}
+function note(p,t){if(p===0||p==='all')log(t);if(p===1||p==='all')send({type:'log',text:t});}
 
-/* ---------- Connection codes: compressed so they are much shorter to paste ---------- */
+/* ---------- Connection codes (compressed) ---------- */
 const b64=u=>btoa(String.fromCharCode(...u)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const unb64=s=>Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));
 const pipe=async(bytes,S,kind)=>new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new S(kind))).arrayBuffer());
@@ -135,8 +133,6 @@ async function decode(t){
 }
 
 /* ---------- WebRTC ---------- */
-// Resolves once gathering is finished, or shortly after a usable public candidate appears,
-// so a slow STUN lookup never leaves the player staring at an empty box.
 function gather(peer){return new Promise(res=>{
  let done=false,grace=0;
  const end=r=>{if(done)return;done=true;clearTimeout(grace);clearTimeout(hard);peer.removeEventListener('icecandidate',onc);peer.removeEventListener('icegatheringstatechange',chk);res(r);};
@@ -144,7 +140,6 @@ function gather(peer){return new Promise(res=>{
  const onc=e=>{if(!e.candidate)end('ok');else if(!grace&&/ typ (srflx|relay)/.test(e.candidate.candidate))grace=setTimeout(()=>end('ok'),2000);};
  const hard=setTimeout(()=>end('slow'),8000);
  peer.addEventListener('icecandidate',onc);peer.addEventListener('icegatheringstatechange',chk);chk();});}
-
 function newPeer(){
  closePeer();pc=new RTCPeerConnection({iceServers:ICE});
  pc.onconnectionstatechange=()=>{const s=pc.connectionState;
@@ -153,43 +148,34 @@ function newPeer(){
  pc.ondatachannel=e=>attach(e.channel);
 }
 // The joining side often receives a channel that is already open, so onopen never fires.
-// Check readyState as well and run the open logic exactly once.
 function attach(ch){
- channel=ch;
- ch.onmessage=onMsg;
+ channel=ch;ch.onmessage=onMsg;
  ch.onclose=()=>{if(channel!==ch)return;setConn('Disconnected','failed');$('banner').hidden=false;};
- const open=()=>{if(openedOn===ch)return;openedOn=ch;setConn('Connected','ok');isHost?broadcastState():send({type:'ready'});launch();};
+ const open=()=>{if(openedOn===ch)return;openedOn=ch;setConn('Connected','ok');isHost?broadcast():send({type:'ready'});launch();};
  ch.onopen=open;if(ch.readyState==='open')open();
 }
 function startRole(host){
  if(roleChosen)return;roleChosen=true;isHost=host;
  $('lobby').classList.add('chosen');$('lobby').classList.toggle('join',!host);
  $(host?'hostBtn':'joinBtn').classList.add('picked');$('hostBtn').disabled=$('joinBtn').disabled=true;
- $('localLabel').textContent=host?'Step 1. Send this code to your partner':'Step 2. Send this reply code back to the host';
- $('remoteLabel').textContent=host?'Step 2. Paste your partner\u2019s reply code':'Step 1. Paste the host\u2019s code';
+ $('localLabel').textContent=host?'Step 1. Send this code to your opponent':'Step 2. Send this reply code back to the host';
+ $('remoteLabel').textContent=host?'Step 2. Paste your opponent\u2019s reply code':'Step 1. Paste the host\u2019s code';
  $('connectBtn').textContent=host?'Connect':'Create reply code';
  $('localSDP').value='';$('localSDP').placeholder=host?'Preparing your code\u2026':'Your reply code appears here after you paste the host\u2019s code.';
  newPeer();
- if(host)makeOffer();else status('Paste the host\u2019s code, then press Create reply code.');
+ if(host){newMatch();makeOffer();}else status('Paste the host\u2019s code, then press Create reply code.');
 }
-async function finishCode(){
- const peer=pc;const r=await gather(peer).then(async v=>[v,await encode(peer.localDescription)]);
- if(pc!==peer)return;$('localSDP').value=r[1];
+async function codeReady(g){const peer=pc;await g;if(pc!==peer)return;$('localSDP').value=await encode(peer.localDescription);
  const direct=/ typ (srflx|relay)/.test(peer.localDescription.sdp);
- status(direct?'Code ready. Copy it and send it'+(isHost?' to your partner.':' back to the host.'):'Code ready, but no public route was found. It will only work on the same network. Try another network or add a TURN server.');
-}
+ status(direct?'Code ready. Copy it and send it'+(isHost?' to your opponent.':' back to the host.'):'Code ready, but no public route was found. It will only work on the same network. Try another network or add a TURN server.');}
 async function makeOffer(){
- try{status('Preparing your code\u2026');channel=pc.createDataChannel('gridwatch',{ordered:true});attach(channel);
-  const g=gather(pc);await pc.setLocalDescription(await pc.createOffer());g.catch(()=>{});await finishCodeWith(g);}
+ try{status('Preparing your code\u2026');attach(pc.createDataChannel('gridwatch',{ordered:true}));
+  const g=gather(pc);await pc.setLocalDescription(await pc.createOffer());await codeReady(g);}
  catch(e){status(e.message||'Could not create the code.');}
 }
-// finishCode variant that reuses a gather() started before setLocalDescription.
-async function finishCodeWith(g){const peer=pc;await g;if(pc!==peer)return;$('localSDP').value=await encode(peer.localDescription);
- const direct=/ typ (srflx|relay)/.test(peer.localDescription.sdp);
- status(direct?'Code ready. Copy it and send it'+(isHost?' to your partner.':' back to the host.'):'Code ready, but no public route was found. It will only work on the same network. Try another network or add a TURN server.');}
 async function acceptRemote(){
  if(!pc){status('Pick Host or Join first.');return;}
- const raw=$('remoteSDP').value;if(!raw.trim()){status('Paste your partner\u2019s code first.');return;}
+ const raw=$('remoteSDP').value;if(!raw.trim()){status('Paste your opponent\u2019s code first.');return;}
  $('connectBtn').disabled=true;
  try{
   const desc=await decode(raw);
@@ -197,7 +183,7 @@ async function acceptRemote(){
    await pc.setRemoteDescription(desc);status('Reply accepted. Connecting\u2026');}
   else{if(pc.signalingState!=='stable')throw new Error('You already made a reply. Send it to the host, or press Start over.');
    if(desc.type!=='offer')throw new Error('That is a reply code. The joiner needs the host\u2019s first code.');
-   await pc.setRemoteDescription(desc);const g=gather(pc);await pc.setLocalDescription(await pc.createAnswer());status('Preparing your reply code\u2026');await finishCodeWith(g);}
+   await pc.setRemoteDescription(desc);const g=gather(pc);await pc.setLocalDescription(await pc.createAnswer());status('Preparing your reply code\u2026');await codeReady(g);}
  }catch(e){status(e.message||'Could not use that code.');}
  finally{$('connectBtn').disabled=false;}
 }
@@ -208,119 +194,143 @@ function closePeer(){
  if(pc){pc.onconnectionstatechange=pc.ondatachannel=null;try{pc.close()}catch{}pc=null;}
 }
 function resetConnection(){
- closePeer();roleChosen=false;isHost=false;started=false;state=makeState();disp.clear();insp=null;
+ closePeer();roleChosen=isHost=started=false;state=null;curSeed=null;disp.clear();
  $('hostBtn').disabled=$('joinBtn').disabled=false;$('hostBtn').classList.remove('picked');$('joinBtn').classList.remove('picked');
  $('lobby').classList.remove('chosen','join');$('localSDP').value=$('remoteSDP').value='';$('banner').hidden=true;
  $('lobby').style.display='block';$('game').style.display='none';setConn('Not connected');status('Pick Host or Join.');
 }
-function send(m){if(channel?.readyState==='open'){try{channel.send(JSON.stringify(m));return true;}catch(e){console.error(e);}}return false;}
+function send(m){if(channel?.readyState==='open'){try{channel.send(JSON.stringify(m,(k,v)=>typeof v==='number'&&!Number.isInteger(v)?Math.round(v*10)/10:v));return true;}catch(e){console.error(e);}}return false;}
+function broadcast(){if(isHost&&state)send({type:'state',state});}
 function onMsg(e){let m;try{m=JSON.parse(e.data);}catch{return;}
- if(isHost){if(m.type==='build')processBuild(m.col,m.row,m.tower);else if(m.type==='sell')sell(m.col,m.row);else if(m.type==='wave')startWave();else if(m.type==='restart')restartGame();else if(m.type==='ready')broadcastState();}
- else if(m.type==='state'&&m.state){state=m.state;const ids=new Set(state.enemies.map(z=>z.id));for(const k of disp.keys())if(!ids.has(k))disp.delete(k);}
- else if(m.type==='log')log(m.text,false);
+ if(isHost){if(m.type==='cmd'&&m.cmd)exec(1,m.cmd);else if(m.type==='ready')broadcast();}
+ else if(m.type==='state'&&m.state){state=m.state;if(state.seed!==curSeed){curSeed=state.seed;gen(curSeed);disp.clear();}}
+ else if(m.type==='log')log(m.text);
 }
-// Clients receive plain data: the host clock (performance.now) means nothing on another machine.
-function snap(){const now=performance.now(),r=n=>Math.round(n*10)/10;return{...state,
- enemies:state.enemies.map(z=>({id:z.id,x:r(z.x),y:r(z.y),hp:z.hp,maxHp:z.maxHp,radius:z.radius,slow:now<z.slowUntil})),
- towers:state.towers.map(t=>({col:t.col,row:t.row,type:t.type})),shots:state.shots.map(b=>({x:Math.round(b.x),y:Math.round(b.y),type:b.type}))};}
-function broadcastState(){if(isHost)send({type:'state',state:snap()});}
 
-/* ---------- Game ---------- */
-function launch(){if(started)return;started=true;$('banner').hidden=true;$('lobby').style.display='none';$('game').style.display='block';
- if(isHost)log('You are the host. Build, then start wave 1.',false);lastFrame=performance.now();requestAnimationFrame(loop);updateHud();}
-function setTool(t){tool=t;insp=null;document.querySelectorAll('.tower').forEach(b=>b.classList.toggle('on',b.dataset.t===t));updateHud();}
-const cellName=(c,r)=>String.fromCharCode(65+c)+(r+1);
-function why(col,row,type){
- const d=TOWERS[type];if(!d||!Number.isInteger(col)||!Number.isInteger(row)||col<0||row<0||col>=COLS||row>=ROWS)return'Outside the grid.';
- if(col>=9&&col<=10&&row>=5&&row<=6)return'The core square must stay clear.';
- if(state.towers.some(t=>t.col===col&&t.row===row))return'That square is taken.';
- if(state.gold<d.cost)return'Not enough credits.';return'';
+/* ---------- Procedural battlefield (same seed gives the same map; mirrored for fairness) ---------- */
+function rng(s){return()=>{s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function gen(seed){
+ const R=rng(seed),half=COLS/2,mid=ROWS/2;WATER.fill(0);
+ const keeps=[{c:2,r:ROWS>>1,hp:150,cd:0},{c:COLS-3,r:ROWS>>1,hp:150,cd:0}];
+ for(let i=0,n=3+(R()*3|0);i<n;i++){const cx=5+R()*(half-5),cy=R()*ROWS,rad=1+R()*2;
+  for(let c=0;c<half;c++)for(let r=0;r<ROWS;r++)if(Math.hypot(c+.5-cx,r+.5-cy)<rad&&Math.abs(r+.5-mid)>1.6&&Math.hypot(c-2,r-mid)>4)WATER[r*COLS+c]=WATER[r*COLS+COLS-1-c]=1;}
+ const taken=new Set(),nodes=[];let id=1;
+ const put=(t,a,n)=>{for(let i=0,g=0;i<n&&g<300;g++){const c=1+(R()*(half-1)|0),r=R()*ROWS|0,k=r*COLS+c;
+  if(WATER[k]||taken.has(k)||Math.hypot(c-2,r-mid)<3)continue;taken.add(k);i++;nodes.push({id:id++,c,r,t,a},{id:id++,c:COLS-1-c,r,t,a});}};
+ put('wood',50,7);put('stone',70,4);
+ return{keeps,nodes};
 }
-function processBuild(col,row,type){if(state.gameOver)return;const e=why(col,row,type);if(e){log(e);return;}
- state.gold-=TOWERS[type].cost;state.towers.push({col,row,type,lastShot:0});log(`${TOWERS[type].name} built at ${cellName(col,row)}.`);broadcastState();}
-function sell(col,row){const i=state.towers.findIndex(t=>t.col===col&&t.row===row);if(i<0)return;const t=state.towers.splice(i,1)[0];state.gold+=Math.floor(TOWERS[t.type].cost*.6);log(`${TOWERS[t.type].name} sold at ${cellName(col,row)}.`);broadcastState();}
-function sellSelected(){if(!insp)return;isHost?sell(insp.col,insp.row):send({type:'sell',col:insp.col,row:insp.row});insp=null;updateHud();}
-function cellAt(e){const r=canvas.getBoundingClientRect();return{col:Math.floor((e.clientX-r.left)*W/r.width/CELL),row:Math.floor((e.clientY-r.top)*H/r.height/CELL)};}
-canvas.addEventListener('click',e=>{if(state.gameOver)return;const{col,row}=cellAt(e);
- const t=state.towers.find(t=>t.col===col&&t.row===row);
- if(t){insp={col,row};updateHud();return;}
- insp=null;isHost?processBuild(col,row,tool):send({type:'build',col,row,tower:tool});updateHud();});
+function newMatch(){const seed=Math.random()*2**32>>>0,g=gen(seed);curSeed=seed;dirty=true;disp.clear();
+ state={seed,keeps:g.keeps,nodes:g.nodes,walls:[],workers:[],raiders:[],res:[{wood:8,stone:0},{wood:8,stone:0}],over:-1,nid:1};
+ for(const p of[0,0,1,1])addWorker(p);}
+function addWorker(p){const K=state.keeps[p];state.workers.push({id:state.nid++,o:p,x:(K.c+.5)*CELL,y:(K.r+.5)*CELL,tg:null,pt:'wood',k:0,ct:'wood',st:'go',tm:0});}
+
+/* ---------- Rules (host runs them; the client only sends commands) ---------- */
+function owned(p,c,r){const K=state.keeps[p];if(Math.max(Math.abs(K.c-c),Math.abs(K.r-r))<=2)return true;return state.walls.some(w=>w.o===p&&Math.max(Math.abs(w.c-c),Math.abs(w.r-r))<=1);}
+function why(p,c,r,k){
+ if(c<0||r<0||c>=COLS||r>=ROWS)return'Outside the map.';if(WATER[r*COLS+c])return'You cannot build on water.';
+ if(state.keeps.some(q=>q.c===c&&q.r===r))return'A keep is there.';if(state.nodes.some(n=>n.c===c&&n.r===r))return'A resource is there.';
+ const w=state.walls.find(w=>w.c===c&&w.r===r);if(w&&!(w.o===p&&k==='stone'&&w.m<140))return'That square is taken.';
+ if(!owned(p,c,r))return'Outside your land. Build outward from your keep or walls.';
+ const t=k==='wall'?'wood':'stone',n=k==='wall'?2:3;return state.res[p][t]<n?`Not enough ${t}. You need ${n}.`:'';
+}
+function exec(p,c){
+ if(!state||state.over>=0&&c.k!=='restart')return;const R=state.res[p],mine=a=>a.filter(x=>x.o===p).length;
+ if(c.k==='restart'){newMatch();note('all','New map generated.');broadcast();return;}
+ if(c.k==='hire'){if(mine(state.workers)>=8)return note(p,'You already have 8 workers.');if(R.wood<6)return note(p,'You need 6 wood to hire a worker.');R.wood-=6;addWorker(p);note(p,'Worker hired.');}
+ else if(c.k==='raid'){if(mine(state.raiders)>=24)return note(p,'Too many raiders alive already.');if(R.wood<6)return note(p,'You need 6 wood to send raiders.');R.wood-=6;
+  const K=state.keeps[p],d=p?-1:1;for(let i=0;i<3;i++)state.raiders.push({id:state.nid++,o:p,x:(K.c+.5)*CELL+d*CELL*1.3,y:(K.r+.5)*CELL+(i-1)*12,hp:40});note('all',p?'Orange sends raiders.':'Blue sends raiders.');}
+ else if(c.k==='gather'){const n=state.nodes.find(n=>n.id===c.id);if(!n)return;let b=null,bd=1e9;
+  for(const w of state.workers)if(w.o===p){const d=Math.hypot(w.x-(n.c+.5)*CELL,w.y-(n.r+.5)*CELL);if(d<bd){bd=d;b=w;}}
+  if(b){b.tg=n.id;b.pt=n.t;if(b.st!=='back')b.st='go';b.tm=0;}}
+ else if(c.k==='wall'||c.k==='stone'){const e=why(p,c.c,c.r,c.k);if(e)return note(p,e);
+  const w=state.walls.find(w=>w.c===c.c&&w.r===c.r);
+  if(c.k==='wall'){R.wood-=2;state.walls.push({c:c.c,r:c.r,o:p,hp:50,m:50});}
+  else{R.stone-=3;if(w){w.m=140;w.hp+=90;}else state.walls.push({c:c.c,r:c.r,o:p,hp:140,m:140});}
+  dirty=true;}
+ broadcast();
+}
+function act(c){if(!state)return;isHost?exec(0,c):send({type:'cmd',cmd:c});}
+function field(t){ // cost to reach keep t from every cell; t's walls are expensive to cross
+ const D=new Float32Array(COLS*ROWS).fill(1e9),done=new Uint8Array(COLS*ROWS),K=state.keeps[t],wh=new Map();
+ for(const w of state.walls)if(w.o===t)wh.set(w.r*COLS+w.c,w.hp);
+ D[K.r*COLS+K.c]=0;
+ for(;;){let u=-1,b=1e9;for(let i=0;i<D.length;i++)if(!done[i]&&D[i]<b){b=D[i];u=i;}if(u<0)break;done[u]=1;
+  const c=u%COLS,r=(u/COLS)|0;
+  for(const[dc,dr]of DIRS){const nc=c+dc,nr=r+dr;if(nc<0||nr<0||nc>=COLS||nr>=ROWS)continue;const j=nr*COLS+nc;if(WATER[j])continue;
+   const cost=1+(wh.has(j)?wh.get(j)/12:0);if(D[u]+cost<D[j])D[j]=D[u]+cost;}}
+ return D;
+}
+function step(o,tx,ty,d){const dx=tx-o.x,dy=ty-o.y,l=Math.hypot(dx,dy);if(l<=d){o.x=tx;o.y=ty;return true;}o.x+=dx/l*d;o.y+=dy/l*d;return false;}
+function sim(dt,now){
+ if(!state||state.over>=0)return;const k=dt/1000;
+ if(dirty||now-lastField>1000){fields=[field(0),field(1)];dirty=false;lastField=now;}
+ const wallAt=new Map(state.walls.map(w=>[w.r*COLS+w.c,w]));
+ for(const w of state.workers){const K=state.keeps[w.o];
+  if(w.st==='back'){if(step(w,(K.c+.5)*CELL,(K.r+.5)*CELL,70*k)){state.res[w.o][w.ct]+=w.k;w.k=0;w.st='go';}continue;}
+  let n=state.nodes.find(n=>n.id===w.tg);
+  if(!n){let bd=1e9;for(const q of state.nodes)if(q.t===w.pt){const d=Math.hypot(w.x-q.c*CELL,w.y-q.r*CELL);if(d<bd){bd=d;n=q;}}w.tg=n?n.id:null;}
+  if(!n)continue;
+  if(step(w,(n.c+.5)*CELL,(n.r+.5)*CELL,70*k)){w.tm+=dt;if(w.tm>900){const t=Math.min(5,n.a);n.a-=t;w.k=t;w.ct=n.t;w.tm=0;w.st='back';}}}
+ state.nodes=state.nodes.filter(n=>n.a>0);
+ for(const r of state.raiders){const t=1-r.o,K=state.keeps[t],c=r.x/CELL|0,q=r.y/CELL|0;
+  if(c===K.c&&q===K.r){K.hp-=10*k;continue;}
+  const D=fields[t];let best=null,bd=D[q*COLS+c];
+  for(const[dc,dr]of DIRS){const nc=c+dc,nr=q+dr;if(nc<0||nr<0||nc>=COLS||nr>=ROWS)continue;const d=D[nr*COLS+nc];if(d<bd){bd=d;best=[nc,nr];}}
+  if(!best)continue;
+  const w=wallAt.get(best[1]*COLS+best[0]);
+  if(w&&w.o===t){w.hp-=14*k;continue;}
+  step(r,(best[0]+.5)*CELL,(best[1]+.5)*CELL,56*k);}
+ for(const K of state.keeps){K.cd-=dt;if(K.cd>0)continue;const o=state.keeps.indexOf(K);let tg=null,bd=100;
+  for(const r of state.raiders)if(r.o!==o){const d=Math.hypot(r.x-(K.c+.5)*CELL,r.y-(K.r+.5)*CELL);if(d<bd){bd=d;tg=r;}}
+  if(tg){tg.hp-=10;K.cd=700;}}
+ state.raiders=state.raiders.filter(r=>r.hp>0);
+ const before=state.walls.length;state.walls=state.walls.filter(w=>w.hp>0);if(state.walls.length<before){dirty=true;note('all','A wall has fallen.');}
+ state.keeps.forEach((K,i)=>{if(K.hp<=0&&state.over<0){K.hp=0;state.over=1-i;note('all',(i?'Blue':'Orange')+' wins.');broadcast();}});
+}
+
+/* ---------- Input and loop ---------- */
+function setTool(t){tool=t;document.querySelectorAll('.tower[data-t]').forEach(b=>b.classList.toggle('on',b.dataset.t===t));}
+function cellAt(e){const r=canvas.getBoundingClientRect();return{c:Math.floor((e.clientX-r.left)*W/r.width/CELL),r:Math.floor((e.clientY-r.top)*H/r.height/CELL)};}
+canvas.addEventListener('click',e=>{if(!state||state.over>=0)return;const{c,r}=cellAt(e);
+ if(tool==='gather'){const n=state.nodes.find(n=>n.c===c&&n.r===r);if(n)act({k:'gather',id:n.id});else log('Click a tree or a rock.');}
+ else act({k:tool,c,r});});
 canvas.addEventListener('mousemove',e=>hover=cellAt(e));canvas.addEventListener('mouseleave',()=>hover=null);
-addEventListener('keydown',e=>{if(!started||/TEXTAREA/.test(e.target.tagName))return;
- if(e.key==='1')setTool('arrow');else if(e.key==='2')setTool('cannon');else if(e.key==='3')setTool('frost');
- else if(e.key==='w'||e.key==='W')requestWave();else if(e.key==='Escape'){insp=null;updateHud();}});
-function requestWave(){if(state.gameOver||state.waveActive)return;isHost?startWave():send({type:'wave'});}
-function startWave(){if(state.gameOver||state.waveActive)return;state.wave++;state.waveActive=true;state.spawnLeft=7+state.wave*3;state.spawnTimer=0;log(`Wave ${state.wave}: ${state.spawnLeft} enemies inbound.`);broadcastState();}
-function requestRestart(){isHost?restartGame():send({type:'restart'});}
-function restartGame(){state=makeState();log('New match. Protect the core.');broadcastState();}
-function spawnEnemy(){const s=Math.floor(Math.random()*4);let x,y;
- if(s===0){x=Math.random()*W;y=-18;}else if(s===1){x=Math.random()*W;y=H+18;}else if(s===2){x=-18;y=Math.random()*H;}else{x=W+18;y=Math.random()*H;}
- const hp=48+state.wave*16;state.enemies.push({id:state.nextEnemyId++,x,y,hp,maxHp:hp,speed:.48+Math.min(state.wave*.012,.22),slowUntil:0,radius:12});}
-function updateHost(dt,now){
- if(state.gameOver)return;const k=dt/16.67;
- if(state.waveActive){state.spawnTimer-=dt;
-  if(state.spawnLeft>0&&state.spawnTimer<=0){spawnEnemy();state.spawnLeft--;state.spawnTimer=Math.max(380,1050-state.wave*28);}
-  if(state.spawnLeft<=0&&state.enemies.length===0){state.waveActive=false;state.gold+=25+state.wave*2;log(`Wave ${state.wave} cleared. Bonus credits paid.`);}}
- for(const t of state.towers){const d=TOWERS[t.type];if(now-t.lastShot<d.rate)continue;
-  const tx=t.col*CELL+CELL/2,ty=t.row*CELL+CELL/2;let target=null,best=d.range;
-  for(const z of state.enemies){const dist=Math.hypot(z.x-tx,z.y-ty);if(dist<best){best=dist;target=z;}}
-  if(target){t.lastShot=now;const a=Math.atan2(target.y-ty,target.x-tx);state.shots.push({x:tx,y:ty,vx:Math.cos(a)*d.speed,vy:Math.sin(a)*d.speed,damage:d.damage,type:t.type,life:55});}}
- for(let i=state.shots.length-1;i>=0;i--){const b=state.shots[i];b.x+=b.vx*k;b.y+=b.vy*k;b.life-=k;
-  if(b.x<0||b.x>W||b.y<0||b.y>H||b.life<=0){state.shots.splice(i,1);continue;}
-  const j=state.enemies.findIndex(z=>Math.hypot(z.x-b.x,z.y-b.y)<z.radius+4);
-  if(j>=0){const z=state.enemies[j];z.hp-=b.damage;if(b.type==='frost')z.slowUntil=now+1800;state.shots.splice(i,1);if(z.hp<=0){state.enemies.splice(j,1);state.kills++;state.gold+=15;}}}
- for(let i=state.enemies.length-1;i>=0;i--){const z=state.enemies[i],a=Math.atan2(H/2-z.y,W/2-z.x),sp=z.speed*(now<z.slowUntil?.42:1)*k;
-  z.x+=Math.cos(a)*sp;z.y+=Math.sin(a)*sp;
-  if(Math.hypot(W/2-z.x,H/2-z.y)<31){state.coreHp=Math.max(0,state.coreHp-8);state.enemies.splice(i,1);
-   if(!state.coreHp){state.gameOver=true;state.waveActive=false;log('Core breached. Restart to try again.');}}}
-}
+addEventListener('keydown',e=>{if(!started||/TEXTAREA/.test(e.target.tagName))return;const k=e.key.toLowerCase();
+ if(k==='1')setTool('wall');else if(k==='2')setTool('stone');else if(k==='3')setTool('gather');else if(k==='h')act({k:'hire'});else if(k==='r')act({k:'raid'});});
+function launch(){if(started)return;started=true;$('banner').hidden=true;$('lobby').style.display='none';$('game').style.display='block';lastFrame=performance.now();requestAnimationFrame(loop);}
 function loop(now){
  if(!started)return;const dt=Math.min(50,Math.max(0,now-lastFrame));lastFrame=now;
- if(isHost){updateHost(dt,now);if(now-lastSnap>50){broadcastState();lastSnap=now;}}
+ if(isHost){sim(dt,now);if(now-lastSnap>50){broadcast();lastSnap=now;}}
  render();if(now-lastHud>100){updateHud();lastHud=now;}requestAnimationFrame(loop);
 }
 function updateHud(){
- $('goldStat').textContent=Math.floor(state.gold);$('hpStat').textContent=Math.max(0,state.coreHp);$('hpBar').style.width=Math.max(0,state.coreHp)/state.maxCoreHp*100+'%';
- $('waveStat').textContent=state.wave;$('killsStat').textContent=state.kills;
- $('waveBtn').disabled=state.waveActive||state.gameOver;$('waveBtn').textContent=state.gameOver?'Core breached':state.waveActive?'Wave in progress':'Start wave '+(state.wave+1);
- $('hint').textContent=state.gameOver?'The core has fallen. Either player can restart.':state.waveActive?'Enemies are closing in. Reinforce the thin side.':'Pick a tower, click an empty square. Credits are shared.';
- const t=insp&&state.towers.find(t=>t.col===insp.col&&t.row===insp.row);
- $('insp').hidden=!t;if(t){$('inspText').textContent=`${TOWERS[t.type].name} at ${cellName(t.col,t.row)}`;$('sellBtn').textContent='Sell for '+Math.floor(TOWERS[t.type].cost*.6);}else insp=null;
+ if(!state)return;const p=me(),R=state.res[p],K=state.keeps[p],E=state.keeps[1-p];
+ $('woodStat').textContent=R.wood;$('stoneStat').textContent=R.stone;$('hpStat').textContent=Math.ceil(K.hp);$('hpBar').style.width=Math.max(0,K.hp)/150*100+'%';$('enStat').textContent=Math.ceil(E.hp);
+ $('hint').textContent=state.over>=0?(state.over===p?'You won. Press New map for another match.':'You lost. Press New map for another match.'):`You are ${p?'orange, on the right':'blue, on the left'}. Gather wood first, then wall in your land.`;
 }
 
-/* ---------- Drawing: a plotted survey sheet ---------- */
-function drawTower(x,y,type,r=15){const c=TOWERS[type].color;ctx.lineWidth=3;ctx.strokeStyle=c;ctx.fillStyle='#eef0e8';ctx.beginPath();
- if(type==='arrow'){ctx.moveTo(x,y-r);ctx.lineTo(x+r,y+r*.8);ctx.lineTo(x-r,y+r*.8);ctx.closePath();}
- else if(type==='cannon')ctx.rect(x-r+1,y-r+1,2*r-2,2*r-2);
- else{ctx.moveTo(x,y-r-2);ctx.lineTo(x+r+2,y);ctx.lineTo(x,y+r+2);ctx.lineTo(x-r-2,y);ctx.closePath();}
- ctx.fill();ctx.stroke();ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,3,0,7);ctx.fill();}
-function ring(x,y,r,color){ctx.setLineDash([6,5]);ctx.lineWidth=1.5;ctx.strokeStyle=color;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.stroke();ctx.setLineDash([]);}
+/* ---------- Drawing ---------- */
+function bar(x,y,w,f,c){ctx.fillStyle='#b4bfb2';ctx.fillRect(x,y,w,4);ctx.fillStyle=c;ctx.fillRect(x,y,w*Math.max(0,Math.min(1,f)),4);}
 function render(){
- ctx.fillStyle='#e6e9e0';ctx.fillRect(0,0,W,H);ctx.lineWidth=1;
- for(let c=0;c<=COLS;c++){ctx.strokeStyle=c%5?'#cdd4ca':'#a5b1a3';ctx.beginPath();ctx.moveTo(c*CELL+.5,0);ctx.lineTo(c*CELL+.5,H);ctx.stroke();}
- for(let r=0;r<=ROWS;r++){ctx.strokeStyle=r%5?'#cdd4ca':'#a5b1a3';ctx.beginPath();ctx.moveTo(0,r*CELL+.5);ctx.lineTo(W,r*CELL+.5);ctx.stroke();}
- ctx.fillStyle='#8a9a8d';ctx.font='11px Archivo,system-ui,sans-serif';ctx.textBaseline='top';
- for(let c=0;c<COLS;c++)ctx.fillText(String.fromCharCode(65+c),c*CELL+4,3);for(let r=1;r<ROWS;r++)ctx.fillText(r+1,4,r*CELL+3);
- ctx.setLineDash([4,4]);ctx.strokeStyle='#5d6d64';ctx.strokeRect(9*CELL+4,5*CELL+4,2*CELL-8,2*CELL-8);ctx.setLineDash([]);
- // hover preview
- if(hover&&!state.gameOver&&hover.col>=0&&hover.row>=0&&hover.col<COLS&&hover.row<ROWS&&!state.towers.some(t=>t.col===hover.col&&t.row===hover.row)){
-  const ok=!why(hover.col,hover.row,tool),x=hover.col*CELL+CELL/2,y=hover.row*CELL+CELL/2;
-  ctx.fillStyle=ok?'rgba(43,73,163,.14)':'rgba(217,83,30,.18)';ctx.fillRect(hover.col*CELL,hover.row*CELL,CELL,CELL);
-  if(ok)ring(x,y,TOWERS[tool].range,TOWERS[tool].color);}
- if(insp){const t=state.towers.find(t=>t.col===insp.col&&t.row===insp.row);if(t)ring(t.col*CELL+CELL/2,t.row*CELL+CELL/2,TOWERS[t.type].range,TOWERS[t.type].color);}
- for(const t of state.towers)drawTower(t.col*CELL+CELL/2,t.row*CELL+CELL/2,t.type);
- // enemies (clients ease toward each snapshot so motion stays smooth)
- for(const z of state.enemies){let x=z.x,y=z.y;
-  if(!isHost){let d=disp.get(z.id);if(!d){d={x,y};disp.set(z.id,d);}d.x+=(x-d.x)*.3;d.y+=(y-d.y)*.3;x=d.x;y=d.y;}
-  const slow=z.slow??performance.now()<z.slowUntil;
-  ctx.fillStyle=slow?'#7fa6d9':'#d9531e';ctx.strokeStyle='#1b2a25';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,z.radius,0,7);ctx.fill();ctx.stroke();
-  ctx.beginPath();ctx.moveTo(x-5,y-5);ctx.lineTo(x+5,y+5);ctx.moveTo(x+5,y-5);ctx.lineTo(x-5,y+5);ctx.stroke();
-  ctx.fillStyle='#b4bfb2';ctx.fillRect(x-14,y-22,28,4);ctx.fillStyle='#1b2a25';ctx.fillRect(x-14,y-22,28*Math.max(0,z.hp/z.maxHp),4);}
- for(const b of state.shots){ctx.fillStyle=TOWERS[b.type].color;ctx.beginPath();ctx.arc(b.x,b.y,b.type==='cannon'?5:3,0,7);ctx.fill();}
- // core
- const cx=W/2,cy=H/2;ctx.strokeStyle='#1b2a25';ctx.lineWidth=3;ctx.fillStyle='#eef0e8';ctx.beginPath();ctx.arc(cx,cy,28,0,7);ctx.fill();ctx.stroke();
- ctx.fillStyle='#1b2a25';ctx.beginPath();ctx.arc(cx,cy,12,0,7);ctx.fill();ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(cx-40,cy);ctx.lineTo(cx+40,cy);ctx.moveTo(cx,cy-40);ctx.lineTo(cx,cy+40);ctx.stroke();
- if(state.gameOver){ctx.fillStyle='rgba(230,233,224,.86)';ctx.fillRect(0,0,W,H);ctx.textAlign='center';ctx.fillStyle='#d9531e';ctx.font='800 56px Archivo,system-ui,sans-serif';ctx.textBaseline='alphabetic';ctx.fillText('Core breached',W/2,H/2);ctx.fillStyle='#1b2a25';ctx.font='20px Archivo,system-ui,sans-serif';ctx.fillText(`You held out for ${state.wave} wave${state.wave===1?'':'s'} and ${state.kills} kills.`,W/2,H/2+36);ctx.textAlign='start';}
+ ctx.fillStyle='#e6e9e0';ctx.fillRect(0,0,W,H);if(!state)return;
+ for(let r=0;r<ROWS;r++)for(let c=0;c<COLS;c++){const x=c*CELL,y=r*CELL;
+  if(WATER[r*COLS+c]){ctx.fillStyle='#bccfd3';ctx.fillRect(x,y,CELL,CELL);ctx.strokeStyle='#8fb0b8';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(x+6,y+14);ctx.quadraticCurveTo(x+13,y+8,x+20,y+14);ctx.quadraticCurveTo(x+27,y+20,x+34,y+14);ctx.stroke();}
+  else for(let p=0;p<2;p++)if(owned(p,c,r)){ctx.fillStyle=p?'rgba(217,83,30,.09)':'rgba(43,73,163,.09)';ctx.fillRect(x,y,CELL,CELL);}}
+ ctx.lineWidth=1;ctx.strokeStyle='#cdd4ca';ctx.beginPath();for(let c=0;c<=COLS;c++){ctx.moveTo(c*CELL+.5,0);ctx.lineTo(c*CELL+.5,H);}for(let r=0;r<=ROWS;r++){ctx.moveTo(0,r*CELL+.5);ctx.lineTo(W,r*CELL+.5);}ctx.stroke();
+ for(const n of state.nodes){const x=(n.c+.5)*CELL,y=(n.r+.5)*CELL,s=.55+.45*Math.min(1,n.a/50);ctx.lineWidth=2;ctx.strokeStyle='#1b2a25';
+  if(n.t==='wood'){ctx.fillStyle='#5f7d52';ctx.beginPath();ctx.arc(x,y-2,13*s,0,7);ctx.fill();ctx.stroke();ctx.fillStyle='#6b4e16';ctx.fillRect(x-2,y+9*s,4,6);}
+  else{ctx.fillStyle='#98a199';ctx.beginPath();ctx.moveTo(x-14*s,y+10);ctx.lineTo(x-7*s,y-11*s);ctx.lineTo(x+8*s,y-9*s);ctx.lineTo(x+14*s,y+10);ctx.closePath();ctx.fill();ctx.stroke();}}
+ for(const w of state.walls){const x=w.c*CELL,y=w.r*CELL,st=w.m>50;ctx.fillStyle=st?'#1b2a25':PC[w.o];ctx.fillRect(x+3,y+3,CELL-6,CELL-6);ctx.strokeStyle=st?PC[w.o]:'#1b2a25';ctx.lineWidth=st?3:2;ctx.strokeRect(x+3,y+3,CELL-6,CELL-6);
+  if(w.hp<w.m)bar(x+5,y+CELL-9,CELL-10,w.hp/w.m,'#d9a21b');}
+ state.keeps.forEach((K,i)=>{const x=K.c*CELL,y=K.r*CELL;ctx.fillStyle=PC[i];ctx.strokeStyle='#1b2a25';ctx.lineWidth=3;ctx.fillRect(x-4,y-4,CELL+8,CELL+8);ctx.strokeRect(x-4,y-4,CELL+8,CELL+8);ctx.fillStyle='#eef0e8';ctx.fillRect(x+10,y+10,CELL-20,CELL-20);bar(x-4,y-12,CELL+8,K.hp/150,'#1b2a25');});
+ const smooth=(key,o)=>{if(isHost)return[o.x,o.y];let d=disp.get(key);if(!d){d={x:o.x,y:o.y};disp.set(key,d);}d.x+=(o.x-d.x)*.3;d.y+=(o.y-d.y)*.3;return[d.x,d.y];};
+ for(const w of state.workers){const[x,y]=smooth('w'+w.id,w);ctx.fillStyle=PC[w.o];ctx.strokeStyle='#1b2a25';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,6,0,7);ctx.fill();ctx.stroke();if(w.k){ctx.fillStyle=w.ct==='wood'?'#6b4e16':'#98a199';ctx.fillRect(x-3,y-13,6,6);}}
+ for(const r of state.raiders){const[x,y]=smooth('r'+r.id,r),d=r.o?-1:1;ctx.fillStyle=PC[r.o];ctx.strokeStyle='#1b2a25';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(x+d*8,y);ctx.lineTo(x-d*6,y-7);ctx.lineTo(x-d*6,y+7);ctx.closePath();ctx.fill();ctx.stroke();bar(x-8,y-14,16,r.hp/40,'#1b2a25');}
+ if(hover&&state.over<0){const{c,r}=hover,x=c*CELL,y=r*CELL;
+  if(tool==='gather'){if(state.nodes.some(n=>n.c===c&&n.r===r)){ctx.strokeStyle='#1d7f7f';ctx.lineWidth=3;ctx.strokeRect(x+2,y+2,CELL-4,CELL-4);}}
+  else if(c>=0&&r>=0&&c<COLS&&r<ROWS){const ok=!why(me(),c,r,tool);ctx.fillStyle=ok?'rgba(29,127,127,.28)':'rgba(217,83,30,.28)';ctx.fillRect(x,y,CELL,CELL);}}
+ if(state.over>=0){ctx.fillStyle='rgba(230,233,224,.86)';ctx.fillRect(0,0,W,H);ctx.textAlign='center';ctx.font='800 56px Archivo,system-ui,sans-serif';ctx.fillStyle=PC[state.over];ctx.fillText(state.over===me()?'You win':'Keep destroyed',W/2,H/2);ctx.fillStyle='#1b2a25';ctx.font='20px Archivo,system-ui,sans-serif';ctx.fillText('Press New map to play again.',W/2,H/2+36);ctx.textAlign='start';}
 }
 addEventListener('beforeunload',closePeer);
 </script>
