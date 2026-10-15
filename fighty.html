@@ -3,189 +3,326 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Gridwatch — Co-op Tower Defence</title>
+<title>Gridwatch: co-op tower defence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..900&display=swap" rel="stylesheet">
 <style>
-:root{color-scheme:dark;--bg:#080d16;--panel:#101a2a;--line:#26374d;--muted:#91a5bd;--cyan:#57e6d1;--blue:#65a9ff;--danger:#ff657a;--gold:#ffd166}
-*{box-sizing:border-box}body{margin:0;min-height:100vh;background:radial-gradient(ellipse at top,#14263b 0,#080d16 55%);color:#edf5ff;font:15px/1.45 system-ui,-apple-system,"Segoe UI",sans-serif}
-button,input,textarea{font:inherit}button{border:1px solid #35506c;border-radius:9px;padding:10px 14px;background:#192a40;color:#edf5ff;cursor:pointer;transition:background .15s,border-color .15s,transform .15s}button:hover:not(:disabled){background:#243d58;border-color:#6c9bc8}button:active:not(:disabled){transform:translateY(1px)}button:disabled{opacity:.45;cursor:not-allowed}.primary{background:linear-gradient(120deg,#35cdbb,#4a9df2);color:#07111d;border:0;font-weight:800}.primary:hover:not(:disabled){background:linear-gradient(120deg,#64ead8,#7db9ff)}.danger{border-color:#713b4c;color:#ffb6c1}.wrap{width:min(1200px,100%);margin:auto;padding:22px}.top{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-bottom:20px}.brand{display:flex;align-items:center;gap:12px}.logo{width:44px;height:44px;border-radius:13px;display:grid;place-items:center;background:#14333d;border:1px solid #2b716f;color:var(--cyan);font-size:23px}.brand h1{font-size:clamp(1.2rem,3vw,1.8rem);margin:0;letter-spacing:.04em}.brand p{margin:2px 0 0;color:var(--muted);font-size:.88rem}.pill{padding:6px 10px;border:1px solid var(--line);border-radius:99px;color:var(--muted);font-size:.8rem;white-space:nowrap}.panel{background:linear-gradient(145deg,rgba(18,30,48,.96),rgba(12,20,33,.96));border:1px solid var(--line);border-radius:16px;box-shadow:0 16px 50px #0003}.lobby{max-width:760px;margin:30px auto;padding:clamp(18px,4vw,30px)}.lobby h2{margin:0 0 6px}.muted{color:var(--muted)}.roles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0}.role{padding:16px;text-align:left;min-height:110px}.role strong{display:block;font-size:1rem;margin-bottom:5px}.role span{display:block;color:var(--muted);font-size:.88rem}.role.selected{border-color:var(--cyan);background:#12323a}.step{margin-top:18px}.step label{display:block;font-weight:700;margin-bottom:7px}.step small{display:block;color:var(--muted);margin-top:6px}textarea{width:100%;min-height:90px;resize:vertical;background:#080f1a;color:#c8f8f0;border:1px solid #2b4059;border-radius:9px;padding:11px;font:12px/1.5 ui-monospace,monospace}textarea:focus,button:focus-visible{outline:2px solid var(--cyan);outline-offset:2px}.row{display:flex;gap:9px;align-items:center;flex-wrap:wrap}.row button{flex:0 0 auto}.status{margin-top:18px;padding:12px 14px;border-radius:9px;background:#0b1421;border:1px solid var(--line);color:var(--gold);font-size:.9rem}.game{display:none}.game-layout{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:16px;align-items:start}.board{padding:12px;min-width:0}.canvas-wrap{width:100%;overflow:hidden;border-radius:10px;background:#080e17;border:1px solid #26394d}canvas{display:block;width:100%;height:auto;aspect-ratio:5/3;touch-action:manipulation;cursor:crosshair}.sidebar{padding:16px}.stats{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:12px}.stat{padding:12px 14px}.stat .k{font-size:.75rem;text-transform:uppercase;letter-spacing:.08em;color:var(--muted)}.stat .v{font-size:1.35rem;font-weight:800;margin-top:3px}.health{height:7px;background:#263448;border-radius:20px;overflow:hidden;margin-top:8px}.health span{display:block;height:100%;width:100%;background:linear-gradient(90deg,#43d6a2,#b7f36b);transition:width .2s}.build-list{display:grid;gap:9px;margin:12px 0}.tower-btn{width:100%;display:flex;align-items:center;gap:10px;text-align:left;padding:10px}.tower-btn .glyph{width:34px;height:34px;border-radius:9px;display:grid;place-items:center;font-size:18px;background:#22354b}.tower-btn .desc{flex:1;min-width:0}.tower-btn strong{display:block}.tower-btn small{color:var(--muted);display:block;font-size:.76rem}.tower-btn .cost{font-weight:800;color:var(--gold);font-size:.85rem}.tower-btn.active{border-color:var(--cyan);background:#12313a;box-shadow:inset 0 0 0 1px #57e6d133}.side-title{font-size:.78rem;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:16px 0 8px}.side-title:first-child{margin-top:0}.help{font-size:.85rem;color:var(--muted);margin:0}.event-log{display:grid;gap:7px;font-size:.82rem;color:#bdcde0}.event-log div{border-left:2px solid #35506c;padding-left:9px}.actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.actions button{flex:1}.hint{font-size:.82rem;color:var(--muted);margin:10px 2px 0}.mobile-build{display:none}.footer{color:#63768c;text-align:center;font-size:.78rem;padding:22px 0 4px}
-@media(max-width:850px){.game-layout{grid-template-columns:1fr}.sidebar{display:grid;grid-template-columns:1fr 1fr;gap:0 20px}.sidebar .side-title,.sidebar .build-list,.sidebar .help,.sidebar .event-log,.sidebar .actions{grid-column:auto}.stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:520px){.wrap{padding:12px}.top{align-items:flex-start}.pill{white-space:normal;text-align:right}.roles{grid-template-columns:1fr}.role{min-height:0}.board{padding:7px}.sidebar{display:block}.stats .stat{padding:10px}.stat .v{font-size:1.15rem}.actions button{min-width:100px}.brand p{font-size:.78rem}}
+:root{--paper:#e6e9e0;--sheet:#eef0e8;--ink:#1b2a25;--mute:#5d6d64;--rule:#b4bfb2;--hot:#d9531e;--cool:#2b49a3;--teal:#1d7f7f;--gold:#9a6a10;color-scheme:light}
+*{box-sizing:border-box}
+body{margin:0;min-height:100vh;background:var(--paper);color:var(--ink);font:15px/1.5 Archivo,system-ui,sans-serif}
+h1,h2,h3{font-stretch:68%;font-weight:800;margin:0;letter-spacing:.01em}
+button,textarea{font:inherit;color:inherit}
+button{background:var(--sheet);border:1.5px solid var(--ink);padding:9px 14px;cursor:pointer;border-radius:3px}
+button:hover:not(:disabled){background:var(--ink);color:var(--paper)}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.go{background:var(--ink);color:var(--paper);font-weight:700}
+button.go:hover:not(:disabled){background:var(--cool);border-color:var(--cool)}
+button.warn{border-color:var(--hot);color:var(--hot)}button.warn:hover:not(:disabled){background:var(--hot);border-color:var(--hot);color:#fff}
+:focus-visible{outline:3px solid var(--cool);outline-offset:2px}
+.wrap{max-width:1180px;margin:auto;padding:20px}
+.top{display:flex;justify-content:space-between;align-items:flex-end;gap:16px;border-bottom:3px solid var(--ink);padding-bottom:10px;margin-bottom:22px}
+.top h1{font-size:clamp(2rem,6vw,3.2rem);line-height:.9}.top p{margin:4px 0 0;color:var(--mute)}
+.conn{display:flex;align-items:center;gap:8px;font-weight:600;white-space:nowrap}
+.conn i{width:11px;height:11px;background:var(--mute);display:block}
+.conn.ok i{background:var(--teal)}.conn.work i{background:var(--gold)}.conn.failed i{background:var(--hot)}
+.lobby{max-width:780px}
+.lobby h2{font-size:1.9rem;margin-bottom:4px}.lobby>p{margin:0 0 18px;color:var(--mute);max-width:60ch}
+.roles{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.role{text-align:left;padding:16px;background:var(--sheet);border-width:2px}
+.role strong{display:block;font-size:1.15rem;font-stretch:75%;margin-bottom:3px}.role span{font-size:.9rem;color:var(--mute)}
+.role:hover:not(:disabled) span{color:inherit}
+.role.picked{background:var(--ink);color:var(--paper)}.role.picked span{color:#c4cfc6}
+.flow{display:none;flex-direction:column;gap:16px;margin-top:22px}.lobby.chosen .flow{display:flex}.lobby.join #boxRemote{order:-1}
+.flow label{display:block;font-weight:700;margin-bottom:5px}
+textarea{width:100%;min-height:84px;resize:vertical;background:var(--sheet);border:1.5px solid var(--ink);border-radius:3px;padding:9px;font:12px/1.45 ui-monospace,Consolas,monospace;word-break:break-all}
+.row{display:flex;gap:8px;margin-top:7px;flex-wrap:wrap}
+.status{margin-top:20px;padding:10px 12px;border-left:4px solid var(--gold);background:var(--sheet)}
+.game{display:none}
+.titleblock{display:grid;grid-template-columns:repeat(4,1fr);border:2px solid var(--ink);background:var(--sheet);margin-bottom:14px}
+.titleblock div{padding:8px 14px;border-left:1.5px solid var(--ink)}.titleblock div:first-child{border-left:0}
+.titleblock small{display:block;color:var(--mute);font-size:.8rem}.titleblock b{font-size:1.7rem;font-stretch:70%;font-weight:800;line-height:1.1}
+.bar{height:5px;background:var(--rule);margin-top:3px}.bar span{display:block;height:100%;width:100%;background:var(--teal);transition:width .2s}
+.layout{display:grid;grid-template-columns:minmax(0,1fr) 270px;gap:16px;align-items:start}
+.board{border:2px solid var(--ink);background:var(--paper);line-height:0}
+canvas{width:100%;height:auto;aspect-ratio:5/3;display:block;cursor:crosshair;touch-action:manipulation}
+.hint{margin:9px 0 0;color:var(--mute);font-size:.9rem;min-height:1.4em}
+.btns{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.side h3{font-size:1.15rem;border-bottom:1.5px solid var(--ink);padding-bottom:3px;margin:0 0 8px}.side h3:not(:first-child){margin-top:20px}
+.tower{display:grid;grid-template-columns:34px 1fr auto;align-items:center;gap:9px;width:100%;text-align:left;margin-bottom:6px;padding:7px 9px;background:var(--sheet)}
+.tower svg{width:30px;height:30px}.tower strong{display:block;line-height:1.2}.tower small{opacity:.7;font-size:.8rem}
+.tower.on{background:var(--ink);color:var(--paper)}.tower.on svg *{stroke:var(--paper)}
+.tower kbd{font:inherit;font-weight:700;opacity:.8}
+.insp{border:1.5px dashed var(--ink);padding:9px;margin-top:8px;font-size:.9rem}.insp[hidden]{display:none}
+.log{font-size:.88rem;color:var(--mute)}.log div{padding:3px 0;border-bottom:1px solid var(--rule)}.log div:first-child{color:var(--ink)}
+.banner{margin-bottom:12px;padding:10px 12px;background:var(--hot);color:#fff;display:flex;justify-content:space-between;align-items:center;gap:10px}.banner[hidden]{display:none}.banner button{background:#fff;color:var(--ink);border-color:#fff}
+@media(max-width:860px){.layout{grid-template-columns:1fr}.titleblock b{font-size:1.4rem}}
+@media(max-width:540px){.wrap{padding:12px}.roles{grid-template-columns:1fr}.titleblock{grid-template-columns:1fr 1fr}.titleblock div:nth-child(3){border-left:0}.titleblock div:nth-child(n+3){border-top:1.5px solid var(--ink)}.conn{white-space:normal;text-align:right}}
 </style>
 </head>
 <body>
 <div class="wrap">
-<header class="top"><div class="brand"><div class="logo">⌁</div><div><h1>GRIDWATCH</h1><p>Co-op tower defence · Hold the line together</p></div></div><div class="pill" id="connectionPill">● Not connected</div></header>
-<section class="panel lobby" id="lobby">
-  <h2>Start a co-op defence</h2><p class="muted">One player hosts the simulation. Connect directly using a one-time code — no account required.</p>
-  <div class="roles"><button class="role" id="hostChoice" onclick="startHost()"><strong>◈ Host a defence</strong><span>Create a room and share your offer code. The host runs the world simulation.</span></button><button class="role" id="joinChoice" onclick="startJoin()"><strong>↗ Join a defence</strong><span>Paste the host's offer code, then return your answer code.</span></button></div>
-  <div class="step"><label for="localSDP">Your connection code</label><textarea id="localSDP" readonly placeholder="Choose Host or Join to generate a code…"></textarea><div class="row" style="margin-top:8px"><button class="primary" onclick="copySDP()">Copy my code</button><button onclick="resetConnection()">Reset connection</button></div><small>Wait until the code says it is ready before copying it. Codes can be large; send them privately.</small></div>
-  <div class="step"><label for="remoteSDP">Partner's connection code</label><textarea id="remoteSDP" placeholder="Paste the other player's code here…"></textarea><div class="row" style="margin-top:8px"><button class="primary" id="connectBtn" onclick="acceptRemoteSDP()">Connect code</button></div></div>
-  <div class="status" id="status" role="status" aria-live="polite">Ready. Choose Host or Join.</div>
+<header class="top"><div><h1>Gridwatch</h1><p>Two players hold one core. No server, no account.</p></div><div class="conn" id="conn"><i></i><span id="connText">Not connected</span></div></header>
+
+<section class="lobby" id="lobby">
+  <h2>Start a defence</h2>
+  <p>One of you hosts and runs the simulation. You connect by trading two short codes over any chat app.</p>
+  <div class="roles">
+    <button class="role" id="hostBtn" onclick="startRole(true)"><strong>Host</strong><span>Create the room. You send the first code.</span></button>
+    <button class="role" id="joinBtn" onclick="startRole(false)"><strong>Join</strong><span>Paste the host's code, then send your reply back.</span></button>
+  </div>
+  <div class="flow">
+    <div id="boxLocal"><label for="localSDP" id="localLabel"></label><textarea id="localSDP" readonly></textarea><div class="row"><button class="go" onclick="copyCode()">Copy code</button><button onclick="resetConnection()">Start over</button></div></div>
+    <div id="boxRemote"><label for="remoteSDP" id="remoteLabel"></label><textarea id="remoteSDP" placeholder="Paste code here"></textarea><div class="row"><button class="go" id="connectBtn" onclick="acceptRemote()"></button></div></div>
+  </div>
+  <div class="status" id="status" role="status" aria-live="polite">Pick Host or Join.</div>
 </section>
+
 <section class="game" id="game">
-  <div class="stats">
-    <div class="panel stat"><div class="k">Shared credits</div><div class="v" id="goldStat">150</div></div>
-    <div class="panel stat"><div class="k">Core integrity</div><div class="v" id="hpStat">100 / 100</div><div class="health"><span id="hpBar"></span></div></div>
-    <div class="panel stat"><div class="k">Wave</div><div class="v" id="waveStat">1</div></div>
-    <div class="panel stat"><div class="k">Enemies defeated</div><div class="v" id="killsStat">0</div></div>
+  <div class="banner" id="banner" hidden><span>Your partner has disconnected.</span><button onclick="resetConnection()">Back to lobby</button></div>
+  <div class="titleblock">
+    <div><small>Credits</small><b id="goldStat">150</b></div>
+    <div><small>Core</small><b id="hpStat">100</b><div class="bar"><span id="hpBar"></span></div></div>
+    <div><small>Wave</small><b id="waveStat">0</b></div>
+    <div><small>Defeated</small><b id="killsStat">0</b></div>
   </div>
-  <div class="game-layout">
-    <main class="panel board"><div class="canvas-wrap"><canvas id="canvas" width="1000" height="600" aria-label="Tower defence grid. Click an empty cell to build a tower."></canvas></div><p class="hint" id="gameHint">Select a tower, then click an empty grid cell. Both players share credits.</p><div class="actions"><button id="startWaveBtn" class="primary" onclick="requestWave()">Start next wave</button><button onclick="requestRestart()" class="danger">Restart match</button></div></main>
-    <aside class="panel sidebar"><div class="side-title">Build defences</div><p class="help">Choose a tower, then place it on the grid. Towers cannot overlap the core or another tower.</p><div class="build-list" id="buildList">
-      <button class="tower-btn active" data-tower="arrow" onclick="setTowerType('arrow')"><span class="glyph">➶</span><span class="desc"><strong>Arrow turret</strong><small>Fast · single target</small></span><span class="cost">50</span></button>
-      <button class="tower-btn" data-tower="cannon" onclick="setTowerType('cannon')"><span class="glyph">✹</span><span class="desc"><strong>Cannon</strong><small>Heavy damage · long range</small></span><span class="cost">100</span></button>
-      <button class="tower-btn" data-tower="frost" onclick="setTowerType('frost')"><span class="glyph">❄</span><span class="desc"><strong>Frost tower</strong><small>Slows enemies on hit</small></span><span class="cost">75</span></button>
-    </div><div class="side-title">Field report</div><div class="event-log" id="eventLog"><div>Defence grid online.</div><div>Protect the core at the centre.</div></div><div class="side-title">How to play</div><p class="help">Enemies approach from the edges. Earn 15 credits per defeat. Each wave gets tougher. If core integrity reaches zero, the match ends.</p></aside>
+  <div class="layout">
+    <main>
+      <div class="board"><canvas id="canvas" width="1000" height="600" aria-label="Tower defence grid. Click an empty square to build."></canvas></div>
+      <p class="hint" id="hint"></p>
+      <div class="btns"><button class="go" id="waveBtn" onclick="requestWave()">Start wave</button><button class="warn" onclick="requestRestart()">Restart match</button></div>
+    </main>
+    <aside class="side">
+      <h3>Towers</h3>
+      <button class="tower on" data-t="arrow" onclick="setTool('arrow')"><svg viewBox="0 0 30 30"><path d="M15 4 26 25H4Z" fill="none" stroke="#1b2a25" stroke-width="2.5"/></svg><span><strong>Arrow</strong><small>Fast, one target</small></span><span>50 <kbd>1</kbd></span></button>
+      <button class="tower" data-t="cannon" onclick="setTool('cannon')"><svg viewBox="0 0 30 30"><rect x="5" y="5" width="20" height="20" fill="none" stroke="#2b49a3" stroke-width="2.5"/></svg><span><strong>Cannon</strong><small>Slow, hits hard, long reach</small></span><span>100 <kbd>2</kbd></span></button>
+      <button class="tower" data-t="frost" onclick="setTool('frost')"><svg viewBox="0 0 30 30"><path d="M15 3 27 15 15 27 3 15Z" fill="none" stroke="#1d7f7f" stroke-width="2.5"/></svg><span><strong>Frost</strong><small>Slows what it hits</small></span><span>75 <kbd>3</kbd></span></button>
+      <div class="insp" id="insp" hidden><span id="inspText"></span><div class="row"><button class="warn" id="sellBtn" onclick="sellSelected()"></button></div></div>
+      <h3>Field log</h3><div class="log" id="log"><div>Core online. Build, then start wave 1.</div></div>
+      <h3>Rules</h3><p class="hint">Enemies come from every edge toward the core. Each kill pays 15 credits and credits are shared. Click a built tower to sell it for 60% back. Keys: 1 to 3 pick a tower, W starts a wave, Esc clears.</p>
+    </aside>
   </div>
 </section>
-<div class="footer">GRIDWATCH · Direct peer-to-peer co-op · Best played in a modern browser</div>
 </div>
 <script>
 'use strict';
-// Manual WebRTC signalling: exchange the offer and answer text between players.
-const rtcConfig={iceServers:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'}]};
+// Add a TURN server here if players are on strict networks (symmetric NAT, some mobile carriers).
+const ICE=[{urls:['stun:stun.l.google.com:19302','stun:stun1.l.google.com:19302']},{urls:'stun:stun.cloudflare.com:3478'}];
 const $=id=>document.getElementById(id);
 const canvas=$('canvas'),ctx=canvas.getContext('2d');
-const W=1000,H=600,CELL=50,COLS=W/CELL,ROWS=H/CELL;
+const W=1000,H=600,CELL=50,COLS=20,ROWS=12;
 const TOWERS={
- arrow:{cost:50,range:155,rate:540,damage:22,speed:10,color:'#ffbf69',glyph:'➶'},
- cannon:{cost:100,range:225,rate:1250,damage:72,speed:6,color:'#ff687e',glyph:'✹'},
- frost:{cost:75,range:165,rate:850,damage:10,speed:8,color:'#67d9ff',glyph:'❄'}
-};
-let pc=null,channel=null,isHost=false,roleChosen=false,gameStarted=false,loopStarted=false,launching=false,selected='arrow',lastFrame=0,lastSnapshot=0,localPlayerId=Math.random().toString(36).slice(2);
-let state=makeState(),lastSentAction=0;
-function makeState(){return{gold:150,coreHp:100,maxCoreHp:100,wave:0,kills:0,towers:[],enemies:[],shots:[],waveActive:false,gameOver:false,spawnLeft:0,spawnTimer:0,nextEnemyId:1,startedAt:Date.now()};}
-function status(message){$('status').textContent='Status: '+message;}
-function pill(message){$('connectionPill').textContent='● '+message;}
-function log(message){const el=document.createElement('div');el.textContent=message;$('eventLog').prepend(el);while($('eventLog').children.length>5)$('eventLog').lastElementChild.remove();}
-function setTowerType(type){if(!TOWERS[type])return;selected=type;document.querySelectorAll('.tower-btn').forEach(b=>b.classList.toggle('active',b.dataset.tower===type));}
-function initPeerConnection(){
-  cleanupPeer(false);pc=new RTCPeerConnection(rtcConfig);
-  pc.onconnectionstatechange=()=>{pill(pc.connectionState==='connected'?'Connected':pc.connectionState);status('Connection '+pc.connectionState+'.');if(pc.connectionState==='failed')status('Connection failed. Reset and exchange fresh codes.');};
-  pc.onicegatheringstatechange=()=>{if(pc.iceGatheringState==='complete')updateLocalCode();};
-  pc.onicecandidate=()=>{if(pc.iceGatheringState==='complete')updateLocalCode();};
-  pc.ondatachannel=e=>{channel=e.channel;setupChannel();};
-  pc.ondatachannelerror=()=>status('Data channel error. Try resetting the connection.');
+ arrow:{name:'Arrow',cost:50,range:155,rate:540,damage:22,speed:10,color:'#1b2a25'},
+ cannon:{name:'Cannon',cost:100,range:225,rate:1250,damage:72,speed:6,color:'#2b49a3'},
+ frost:{name:'Frost',cost:75,range:165,rate:850,damage:10,speed:8,color:'#1d7f7f'}};
+let pc=null,channel=null,openedOn=null,isHost=false,roleChosen=false,started=false,tool='arrow',insp=null,hover=null,lastFrame=0,lastSnap=0,lastHud=0;
+let state=makeState();const disp=new Map();
+
+function makeState(){return{gold:150,coreHp:100,maxCoreHp:100,wave:0,kills:0,towers:[],enemies:[],shots:[],waveActive:false,gameOver:false,spawnLeft:0,spawnTimer:0,nextEnemyId:1};}
+function status(m){$('status').textContent=m;}
+function setConn(text,cls){$('connText').textContent=text;$('conn').className='conn '+(cls||'');}
+function log(text,share=true){const d=document.createElement('div');d.textContent=text;$('log').prepend(d);while($('log').children.length>6)$('log').lastElementChild.remove();if(share&&isHost)send({type:'log',text});}
+
+/* ---------- Connection codes: compressed so they are much shorter to paste ---------- */
+const b64=u=>btoa(String.fromCharCode(...u)).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+const unb64=s=>Uint8Array.from(atob(s.replace(/-/g,'+').replace(/_/g,'/')),c=>c.charCodeAt(0));
+const pipe=async(bytes,S,kind)=>new Uint8Array(await new Response(new Blob([bytes]).stream().pipeThrough(new S(kind))).arrayBuffer());
+async function encode(d){const j=new TextEncoder().encode(JSON.stringify({type:d.type,sdp:d.sdp}));return window.CompressionStream?'GW1.'+b64(await pipe(j,CompressionStream,'deflate-raw')):'GW0.'+b64(j);}
+async function decode(t){
+ t=t.trim();if(t[0]==='{')return JSON.parse(t);
+ const m=t.replace(/\s+/g,'').match(/^GW([01])\.([\w-]+)$/);if(!m)throw new Error('That is not a Gridwatch code. Copy the whole code and try again.');
+ let bytes=unb64(m[2]);if(m[1]==='1'){if(!window.DecompressionStream)throw new Error('This browser cannot read compressed codes. Use a current Chrome, Edge, Firefox or Safari.');bytes=await pipe(bytes,DecompressionStream,'deflate-raw');}
+ return JSON.parse(new TextDecoder().decode(bytes));
 }
-function updateLocalCode(){if(pc?.localDescription)$('localSDP').value=JSON.stringify(pc.localDescription);}
-async function waitForIceGathering(){
-  const peer=pc;
-  if(!peer){throw new Error('Connection setup was reset. Choose Host or Join again.');}
-  if(peer.iceGatheringState==='complete'){
-    updateLocalCode();status('Connection code ready. Copy it and send it to your partner.');return;
-  }
-  status('Gathering network routes… this can take a few seconds.');
-  // Some browsers/networks never report ICE gathering as complete even though
-  // usable candidates have already been collected. Do not discard the offer or
-  // answer in that case: use the best SDP available and warn the player.
-  const completed=await new Promise(resolve=>{
-    let finished=false;
-    const finish=value=>{if(finished)return;finished=true;clearTimeout(timeout);peer.removeEventListener('icegatheringstatechange',check);resolve(value);};
-    const check=()=>{if(peer.iceGatheringState==='complete')finish(true);};
-    const timeout=setTimeout(()=>finish(false),10000);
-    peer.addEventListener('icegatheringstatechange',check);
-    check();
-  });
-  if(pc!==peer){throw new Error('Connection setup was reset. Try again.');}
-  updateLocalCode();
-  if(completed){status('Connection code ready. Copy it and send it to your partner.');}
-  else{status('Timed out waiting for every network route, but a connection code was created. Copy it and try connecting. If it fails, both players should reset and generate fresh codes; different networks may require a TURN relay.');}
+
+/* ---------- WebRTC ---------- */
+// Resolves once gathering is finished, or shortly after a usable public candidate appears,
+// so a slow STUN lookup never leaves the player staring at an empty box.
+function gather(peer){return new Promise(res=>{
+ let done=false,grace=0;
+ const end=r=>{if(done)return;done=true;clearTimeout(grace);clearTimeout(hard);peer.removeEventListener('icecandidate',onc);peer.removeEventListener('icegatheringstatechange',chk);res(r);};
+ const chk=()=>{if(peer.iceGatheringState==='complete')end('ok');};
+ const onc=e=>{if(!e.candidate)end('ok');else if(!grace&&/ typ (srflx|relay)/.test(e.candidate.candidate))grace=setTimeout(()=>end('ok'),2000);};
+ const hard=setTimeout(()=>end('slow'),8000);
+ peer.addEventListener('icecandidate',onc);peer.addEventListener('icegatheringstatechange',chk);chk();});}
+
+function newPeer(){
+ closePeer();pc=new RTCPeerConnection({iceServers:ICE});
+ pc.onconnectionstatechange=()=>{const s=pc.connectionState;
+  setConn({connected:'Connected',connecting:'Connecting',disconnected:'Connection lost',failed:'Connection failed'}[s]||'Not connected',s==='connected'?'ok':s==='failed'||s==='disconnected'?'failed':'work');
+  if(s==='failed')status('Connection failed. Both players press Start over and swap fresh codes. Strict networks may need a TURN server.');};
+ pc.ondatachannel=e=>attach(e.channel);
 }
-async function startHost(){
- if(roleChosen)return;roleChosen=true;isHost=true;$('hostChoice').classList.add('selected');$('joinChoice').disabled=true;status('Creating host offer…');
- try{initPeerConnection();channel=pc.createDataChannel('gridwatch',{ordered:true});setupChannel();await pc.setLocalDescription(await pc.createOffer());updateLocalCode();await waitForIceGathering();}
- catch(e){status(e.message||'Could not create offer.');}
+// The joining side often receives a channel that is already open, so onopen never fires.
+// Check readyState as well and run the open logic exactly once.
+function attach(ch){
+ channel=ch;
+ ch.onmessage=onMsg;
+ ch.onclose=()=>{if(channel!==ch)return;setConn('Disconnected','failed');$('banner').hidden=false;};
+ const open=()=>{if(openedOn===ch)return;openedOn=ch;setConn('Connected','ok');isHost?broadcastState():send({type:'ready'});launch();};
+ ch.onopen=open;if(ch.readyState==='open')open();
 }
-async function startJoin(){
- if(roleChosen)return;roleChosen=true;isHost=false;$('joinChoice').classList.add('selected');$('hostChoice').disabled=true;initPeerConnection();status('Paste the host offer below, then connect.');
+function startRole(host){
+ if(roleChosen)return;roleChosen=true;isHost=host;
+ $('lobby').classList.add('chosen');$('lobby').classList.toggle('join',!host);
+ $(host?'hostBtn':'joinBtn').classList.add('picked');$('hostBtn').disabled=$('joinBtn').disabled=true;
+ $('localLabel').textContent=host?'Step 1. Send this code to your partner':'Step 2. Send this reply code back to the host';
+ $('remoteLabel').textContent=host?'Step 2. Paste your partner\u2019s reply code':'Step 1. Paste the host\u2019s code';
+ $('connectBtn').textContent=host?'Connect':'Create reply code';
+ $('localSDP').value='';$('localSDP').placeholder=host?'Preparing your code\u2026':'Your reply code appears here after you paste the host\u2019s code.';
+ newPeer();
+ if(host)makeOffer();else status('Paste the host\u2019s code, then press Create reply code.');
 }
-async function acceptRemoteSDP(){
- if(!pc){status('Choose Host or Join first.');return;}
- const raw=$('remoteSDP').value.trim();if(!raw){status('Paste your partner’s code first.');return;}
+async function finishCode(){
+ const peer=pc;const r=await gather(peer).then(async v=>[v,await encode(peer.localDescription)]);
+ if(pc!==peer)return;$('localSDP').value=r[1];
+ const direct=/ typ (srflx|relay)/.test(peer.localDescription.sdp);
+ status(direct?'Code ready. Copy it and send it'+(isHost?' to your partner.':' back to the host.'):'Code ready, but no public route was found. It will only work on the same network. Try another network or add a TURN server.');
+}
+async function makeOffer(){
+ try{status('Preparing your code\u2026');channel=pc.createDataChannel('gridwatch',{ordered:true});attach(channel);
+  const g=gather(pc);await pc.setLocalDescription(await pc.createOffer());g.catch(()=>{});await finishCodeWith(g);}
+ catch(e){status(e.message||'Could not create the code.');}
+}
+// finishCode variant that reuses a gather() started before setLocalDescription.
+async function finishCodeWith(g){const peer=pc;await g;if(pc!==peer)return;$('localSDP').value=await encode(peer.localDescription);
+ const direct=/ typ (srflx|relay)/.test(peer.localDescription.sdp);
+ status(direct?'Code ready. Copy it and send it'+(isHost?' to your partner.':' back to the host.'):'Code ready, but no public route was found. It will only work on the same network. Try another network or add a TURN server.');}
+async function acceptRemote(){
+ if(!pc){status('Pick Host or Join first.');return;}
+ const raw=$('remoteSDP').value;if(!raw.trim()){status('Paste your partner\u2019s code first.');return;}
  $('connectBtn').disabled=true;
  try{
-  const desc=JSON.parse(raw);if(!desc.type||!desc.sdp)throw new Error('That does not look like a connection code.');
-  await pc.setRemoteDescription(desc);
-  if(!isHost){await pc.setLocalDescription(await pc.createAnswer());updateLocalCode();await waitForIceGathering();status('Answer ready. Copy it back to the host.');}
-  else status('Offer accepted. Waiting for your partner to connect…');
- }catch(e){status(e.message||'Invalid connection code. Copy it again and retry.');}
+  const desc=await decode(raw);
+  if(isHost){if(pc.signalingState!=='have-local-offer')throw new Error('This connection already has a reply. Press Start over for a fresh code.');
+   await pc.setRemoteDescription(desc);status('Reply accepted. Connecting\u2026');}
+  else{if(pc.signalingState!=='stable')throw new Error('You already made a reply. Send it to the host, or press Start over.');
+   if(desc.type!=='offer')throw new Error('That is a reply code. The joiner needs the host\u2019s first code.');
+   await pc.setRemoteDescription(desc);const g=gather(pc);await pc.setLocalDescription(await pc.createAnswer());status('Preparing your reply code\u2026');await finishCodeWith(g);}
+ }catch(e){status(e.message||'Could not use that code.');}
  finally{$('connectBtn').disabled=false;}
 }
-function setupChannel(){
- if(!channel)return;
- channel.onopen=()=>{pill('Connected');status('Connected! Starting defence…');if(isHost){send({type:'hello',state});}else send({type:'ready'});launchGame();};
- channel.onclose=()=>{pill('Disconnected');status('Peer disconnected. The match is paused for this connection.');};
- channel.onerror=()=>status('Data channel error.');
- channel.onmessage=e=>{let msg;try{msg=JSON.parse(e.data);}catch{return;}
-  if(isHost){if(msg.type==='build')processBuild(msg.col,msg.row,msg.tower);else if(msg.type==='wave')startWave();else if(msg.type==='restart')restartGame();else if(msg.type==='ready')send({type:'state',state});}
-  else if(msg.type==='state'&&msg.state){state=msg.state;updateHud();}
-  else if(msg.type==='hello'&&msg.state){state=msg.state;updateHud();}
- };
+function copyCode(){const t=$('localSDP').value;if(!t){status('Your code is not ready yet.');return;}
+ (navigator.clipboard?.writeText(t)||Promise.reject()).then(()=>status('Code copied.')).catch(()=>{$('localSDP').select();status('Press Ctrl+C or long-press to copy the selected code.');});}
+function closePeer(){
+ if(channel){channel.onopen=channel.onmessage=channel.onclose=null;try{channel.close()}catch{}channel=null;}openedOn=null;
+ if(pc){pc.onconnectionstatechange=pc.ondatachannel=null;try{pc.close()}catch{}pc=null;}
 }
-function send(message){if(channel?.readyState==='open'){try{channel.send(JSON.stringify(message));return true;}catch(e){console.error(e);}}return false;}
-function copySDP(){const text=$('localSDP').value;if(!text){status('No code to copy yet.');return;}if(navigator.clipboard?.writeText){navigator.clipboard.writeText(text).then(()=>status('Connection code copied.')).catch(()=>fallbackCopy());}else fallbackCopy();}
-function fallbackCopy(){const el=$('localSDP');el.focus();el.select();try{document.execCommand('copy');status('Code selected/copied if your browser permits it.');}catch{status('Select the code and copy it manually.');}}
-function cleanupPeer(resetRole=true){if(channel){channel.onopen=channel.onmessage=channel.onclose=channel.onerror=null;try{channel.close();}catch{}channel=null;}if(pc){pc.onconnectionstatechange=pc.onicecandidate=pc.onicegatheringstatechange=pc.ondatachannel=null;try{pc.close();}catch{}pc=null;}if(resetRole){roleChosen=false;isHost=false;gameStarted=false;loopStarted=false;launching=false;}}
-function resetConnection(){cleanupPeer();$('hostChoice').disabled=false;$('joinChoice').disabled=false;$('hostChoice').classList.remove('selected');$('joinChoice').classList.remove('selected');$('localSDP').value='';$('remoteSDP').value='';$('lobby').style.display='block';$('game').style.display='none';pill('Not connected');status('Reset complete. Choose Host or Join.');}
-function launchGame(){if(launching||gameStarted)return;launching=true;gameStarted=true;$('lobby').style.display='none';$('game').style.display='block';if(isHost&&state.wave===0)log('Build your first line, then start wave 1.');if(!loopStarted){loopStarted=true;lastFrame=performance.now();requestAnimationFrame(gameLoop);}launching=false;}
-function requestBuild(col,row){if(state.gameOver)return;if(isHost)processBuild(col,row,selected);else if(channel?.readyState==='open')send({type:'build',col,row,tower:selected});}
-function processBuild(col,row,type){
- const def=TOWERS[type];if(!def||!Number.isInteger(col)||!Number.isInteger(row)||col<0||row<0||col>=COLS||row>=ROWS||state.gameOver)return;
- if(col>=9&&col<=10&&row>=5&&row<=6){log('The core area must stay clear.');return;}
- if(state.towers.some(t=>t.col===col&&t.row===row)){log('That tile is already occupied.');return;}
- if(state.gold<def.cost){log('Not enough credits for that tower.');return;}
- state.gold-=def.cost;state.towers.push({col,row,type,lastShot:0});log(`${type[0].toUpperCase()+type.slice(1)} tower deployed.`);updateHud();broadcastState();
+function resetConnection(){
+ closePeer();roleChosen=false;isHost=false;started=false;state=makeState();disp.clear();insp=null;
+ $('hostBtn').disabled=$('joinBtn').disabled=false;$('hostBtn').classList.remove('picked');$('joinBtn').classList.remove('picked');
+ $('lobby').classList.remove('chosen','join');$('localSDP').value=$('remoteSDP').value='';$('banner').hidden=true;
+ $('lobby').style.display='block';$('game').style.display='none';setConn('Not connected');status('Pick Host or Join.');
 }
-canvas.addEventListener('click',e=>{const r=canvas.getBoundingClientRect();const x=(e.clientX-r.left)*canvas.width/r.width,y=(e.clientY-r.top)*canvas.height/r.height;requestBuild(Math.floor(x/CELL),Math.floor(y/CELL));});
-function requestWave(){if(state.gameOver)return;if(isHost)startWave();else send({type:'wave'});}
-function startWave(){if(!isHost||state.gameOver||state.waveActive)return;state.wave++;state.waveActive=true;state.spawnLeft=7+state.wave*3;state.spawnTimer=0;log(`Wave ${state.wave} incoming — ${state.spawnLeft} enemies detected.`);updateHud();broadcastState();}
-function requestRestart(){if(isHost)restartGame();else send({type:'restart'});}
-function restartGame(){if(!isHost)return;state=makeState();log('New defence started. Protect the core!');updateHud();broadcastState();}
-function spawnEnemy(){
- const side=Math.floor(Math.random()*4);let x,y;if(side===0){x=Math.random()*W;y=-18;}else if(side===1){x=Math.random()*W;y=H+18;}else if(side===2){x=-18;y=Math.random()*H;}else{x=W+18;y=Math.random()*H;}
- const hp=48+state.wave*16;state.enemies.push({id:state.nextEnemyId++,x,y,hp,maxHp:hp,speed:.48+Math.min(state.wave*.012,.22),slowUntil:0,radius:12});
+function send(m){if(channel?.readyState==='open'){try{channel.send(JSON.stringify(m));return true;}catch(e){console.error(e);}}return false;}
+function onMsg(e){let m;try{m=JSON.parse(e.data);}catch{return;}
+ if(isHost){if(m.type==='build')processBuild(m.col,m.row,m.tower);else if(m.type==='sell')sell(m.col,m.row);else if(m.type==='wave')startWave();else if(m.type==='restart')restartGame();else if(m.type==='ready')broadcastState();}
+ else if(m.type==='state'&&m.state){state=m.state;const ids=new Set(state.enemies.map(z=>z.id));for(const k of disp.keys())if(!ids.has(k))disp.delete(k);}
+ else if(m.type==='log')log(m.text,false);
 }
+// Clients receive plain data: the host clock (performance.now) means nothing on another machine.
+function snap(){const now=performance.now(),r=n=>Math.round(n*10)/10;return{...state,
+ enemies:state.enemies.map(z=>({id:z.id,x:r(z.x),y:r(z.y),hp:z.hp,maxHp:z.maxHp,radius:z.radius,slow:now<z.slowUntil})),
+ towers:state.towers.map(t=>({col:t.col,row:t.row,type:t.type})),shots:state.shots.map(b=>({x:Math.round(b.x),y:Math.round(b.y),type:b.type}))};}
+function broadcastState(){if(isHost)send({type:'state',state:snap()});}
+
+/* ---------- Game ---------- */
+function launch(){if(started)return;started=true;$('banner').hidden=true;$('lobby').style.display='none';$('game').style.display='block';
+ if(isHost)log('You are the host. Build, then start wave 1.',false);lastFrame=performance.now();requestAnimationFrame(loop);updateHud();}
+function setTool(t){tool=t;insp=null;document.querySelectorAll('.tower').forEach(b=>b.classList.toggle('on',b.dataset.t===t));updateHud();}
+const cellName=(c,r)=>String.fromCharCode(65+c)+(r+1);
+function why(col,row,type){
+ const d=TOWERS[type];if(!d||!Number.isInteger(col)||!Number.isInteger(row)||col<0||row<0||col>=COLS||row>=ROWS)return'Outside the grid.';
+ if(col>=9&&col<=10&&row>=5&&row<=6)return'The core square must stay clear.';
+ if(state.towers.some(t=>t.col===col&&t.row===row))return'That square is taken.';
+ if(state.gold<d.cost)return'Not enough credits.';return'';
+}
+function processBuild(col,row,type){if(state.gameOver)return;const e=why(col,row,type);if(e){log(e);return;}
+ state.gold-=TOWERS[type].cost;state.towers.push({col,row,type,lastShot:0});log(`${TOWERS[type].name} built at ${cellName(col,row)}.`);broadcastState();}
+function sell(col,row){const i=state.towers.findIndex(t=>t.col===col&&t.row===row);if(i<0)return;const t=state.towers.splice(i,1)[0];state.gold+=Math.floor(TOWERS[t.type].cost*.6);log(`${TOWERS[t.type].name} sold at ${cellName(col,row)}.`);broadcastState();}
+function sellSelected(){if(!insp)return;isHost?sell(insp.col,insp.row):send({type:'sell',col:insp.col,row:insp.row});insp=null;updateHud();}
+function cellAt(e){const r=canvas.getBoundingClientRect();return{col:Math.floor((e.clientX-r.left)*W/r.width/CELL),row:Math.floor((e.clientY-r.top)*H/r.height/CELL)};}
+canvas.addEventListener('click',e=>{if(state.gameOver)return;const{col,row}=cellAt(e);
+ const t=state.towers.find(t=>t.col===col&&t.row===row);
+ if(t){insp={col,row};updateHud();return;}
+ insp=null;isHost?processBuild(col,row,tool):send({type:'build',col,row,tower:tool});updateHud();});
+canvas.addEventListener('mousemove',e=>hover=cellAt(e));canvas.addEventListener('mouseleave',()=>hover=null);
+addEventListener('keydown',e=>{if(!started||/TEXTAREA/.test(e.target.tagName))return;
+ if(e.key==='1')setTool('arrow');else if(e.key==='2')setTool('cannon');else if(e.key==='3')setTool('frost');
+ else if(e.key==='w'||e.key==='W')requestWave();else if(e.key==='Escape'){insp=null;updateHud();}});
+function requestWave(){if(state.gameOver||state.waveActive)return;isHost?startWave():send({type:'wave'});}
+function startWave(){if(state.gameOver||state.waveActive)return;state.wave++;state.waveActive=true;state.spawnLeft=7+state.wave*3;state.spawnTimer=0;log(`Wave ${state.wave}: ${state.spawnLeft} enemies inbound.`);broadcastState();}
+function requestRestart(){isHost?restartGame():send({type:'restart'});}
+function restartGame(){state=makeState();log('New match. Protect the core.');broadcastState();}
+function spawnEnemy(){const s=Math.floor(Math.random()*4);let x,y;
+ if(s===0){x=Math.random()*W;y=-18;}else if(s===1){x=Math.random()*W;y=H+18;}else if(s===2){x=-18;y=Math.random()*H;}else{x=W+18;y=Math.random()*H;}
+ const hp=48+state.wave*16;state.enemies.push({id:state.nextEnemyId++,x,y,hp,maxHp:hp,speed:.48+Math.min(state.wave*.012,.22),slowUntil:0,radius:12});}
 function updateHost(dt,now){
- if(state.gameOver)return;
- if(state.waveActive){state.spawnTimer-=dt;if(state.spawnLeft>0&&state.spawnTimer<=0){spawnEnemy();state.spawnLeft--;state.spawnTimer=Math.max(380,1050-state.wave*28);}if(state.spawnLeft<=0&&state.enemies.length===0){state.waveActive=false;state.gold+=25+state.wave*2;log(`Wave ${state.wave} cleared. Bonus credits awarded.`);}}
- const coreX=W/2,coreY=H/2;
- for(const t of state.towers){const d=TOWERS[t.type];if(now-t.lastShot<d.rate)continue;let target=null,best=d.range;const tx=t.col*CELL+CELL/2,ty=t.row*CELL+CELL/2;for(const z of state.enemies){const dist=Math.hypot(z.x-tx,z.y-ty);if(dist<best){best=dist;target=z;}}if(target){t.lastShot=now;const angle=Math.atan2(target.y-ty,target.x-tx);state.shots.push({x:tx,y:ty,vx:Math.cos(angle)*d.speed,vy:Math.sin(angle)*d.speed,damage:d.damage,type:t.type,life:55});}}
- for(let i=state.shots.length-1;i>=0;i--){const b=state.shots[i];b.x+=b.vx*dt/16.67;b.y+=b.vy*dt/16.67;b.life-=dt/16.67;if(b.x<0||b.x>W||b.y<0||b.y>H||b.life<=0){state.shots.splice(i,1);continue;}let hit=-1;for(let j=0;j<state.enemies.length;j++){if(Math.hypot(state.enemies[j].x-b.x,state.enemies[j].y-b.y)<state.enemies[j].radius+4){hit=j;break;}}if(hit>=0){const z=state.enemies[hit];z.hp-=b.damage;if(b.type==='frost')z.slowUntil=now+1800;state.shots.splice(i,1);if(z.hp<=0){state.enemies.splice(hit,1);state.kills++;state.gold+=15;}}}
- for(let i=state.enemies.length-1;i>=0;i--){const z=state.enemies[i],angle=Math.atan2(coreY-z.y,coreX-z.x);const speed=z.speed*(now<z.slowUntil?.42:1)*dt/16.67;z.x+=Math.cos(angle)*speed;z.y+=Math.sin(angle)*speed;if(Math.hypot(coreX-z.x,coreY-z.y)<31){state.coreHp=Math.max(0,state.coreHp-8);state.enemies.splice(i,1);if(state.coreHp===0){state.gameOver=true;state.waveActive=false;log('CORE BREACHED — defence failed. Restart to try again.');}}}
+ if(state.gameOver)return;const k=dt/16.67;
+ if(state.waveActive){state.spawnTimer-=dt;
+  if(state.spawnLeft>0&&state.spawnTimer<=0){spawnEnemy();state.spawnLeft--;state.spawnTimer=Math.max(380,1050-state.wave*28);}
+  if(state.spawnLeft<=0&&state.enemies.length===0){state.waveActive=false;state.gold+=25+state.wave*2;log(`Wave ${state.wave} cleared. Bonus credits paid.`);}}
+ for(const t of state.towers){const d=TOWERS[t.type];if(now-t.lastShot<d.rate)continue;
+  const tx=t.col*CELL+CELL/2,ty=t.row*CELL+CELL/2;let target=null,best=d.range;
+  for(const z of state.enemies){const dist=Math.hypot(z.x-tx,z.y-ty);if(dist<best){best=dist;target=z;}}
+  if(target){t.lastShot=now;const a=Math.atan2(target.y-ty,target.x-tx);state.shots.push({x:tx,y:ty,vx:Math.cos(a)*d.speed,vy:Math.sin(a)*d.speed,damage:d.damage,type:t.type,life:55});}}
+ for(let i=state.shots.length-1;i>=0;i--){const b=state.shots[i];b.x+=b.vx*k;b.y+=b.vy*k;b.life-=k;
+  if(b.x<0||b.x>W||b.y<0||b.y>H||b.life<=0){state.shots.splice(i,1);continue;}
+  const j=state.enemies.findIndex(z=>Math.hypot(z.x-b.x,z.y-b.y)<z.radius+4);
+  if(j>=0){const z=state.enemies[j];z.hp-=b.damage;if(b.type==='frost')z.slowUntil=now+1800;state.shots.splice(i,1);if(z.hp<=0){state.enemies.splice(j,1);state.kills++;state.gold+=15;}}}
+ for(let i=state.enemies.length-1;i>=0;i--){const z=state.enemies[i],a=Math.atan2(H/2-z.y,W/2-z.x),sp=z.speed*(now<z.slowUntil?.42:1)*k;
+  z.x+=Math.cos(a)*sp;z.y+=Math.sin(a)*sp;
+  if(Math.hypot(W/2-z.x,H/2-z.y)<31){state.coreHp=Math.max(0,state.coreHp-8);state.enemies.splice(i,1);
+   if(!state.coreHp){state.gameOver=true;state.waveActive=false;log('Core breached. Restart to try again.');}}}
 }
-function broadcastState(){if(isHost)send({type:'state',state});}
-function gameLoop(now){
- if(!gameStarted)return;const dt=Math.min(50,Math.max(0,now-lastFrame));lastFrame=now;
- if(isHost){updateHost(dt,now);if(now-lastSnapshot>80){broadcastState();lastSnapshot=now;}}
- render();updateHud();requestAnimationFrame(gameLoop);
+function loop(now){
+ if(!started)return;const dt=Math.min(50,Math.max(0,now-lastFrame));lastFrame=now;
+ if(isHost){updateHost(dt,now);if(now-lastSnap>50){broadcastState();lastSnap=now;}}
+ render();if(now-lastHud>100){updateHud();lastHud=now;}requestAnimationFrame(loop);
 }
 function updateHud(){
- $('goldStat').textContent=Math.floor(state.gold);$('hpStat').textContent=`${Math.max(0,state.coreHp)} / ${state.maxCoreHp}`;$('hpBar').style.width=`${Math.max(0,state.coreHp)/state.maxCoreHp*100}%`;$('waveStat').textContent=state.wave||'—';$('killsStat').textContent=state.kills;
- $('startWaveBtn').disabled=!isHost||state.waveActive||state.gameOver;$('startWaveBtn').textContent=state.gameOver?'Core breached':state.waveActive?'Wave in progress…':'Start next wave';
- $('gameHint').textContent=state.gameOver?'The core has fallen. The host can restart the match.':!isHost?'You are supporting the host. Build towers and help protect the core.':state.waveActive?'Enemies are approaching — reinforce weak areas.':'Build your defences, then start the next wave.';
+ $('goldStat').textContent=Math.floor(state.gold);$('hpStat').textContent=Math.max(0,state.coreHp);$('hpBar').style.width=Math.max(0,state.coreHp)/state.maxCoreHp*100+'%';
+ $('waveStat').textContent=state.wave;$('killsStat').textContent=state.kills;
+ $('waveBtn').disabled=state.waveActive||state.gameOver;$('waveBtn').textContent=state.gameOver?'Core breached':state.waveActive?'Wave in progress':'Start wave '+(state.wave+1);
+ $('hint').textContent=state.gameOver?'The core has fallen. Either player can restart.':state.waveActive?'Enemies are closing in. Reinforce the thin side.':'Pick a tower, click an empty square. Credits are shared.';
+ const t=insp&&state.towers.find(t=>t.col===insp.col&&t.row===insp.row);
+ $('insp').hidden=!t;if(t){$('inspText').textContent=`${TOWERS[t.type].name} at ${cellName(t.col,t.row)}`;$('sellBtn').textContent='Sell for '+Math.floor(TOWERS[t.type].cost*.6);}else insp=null;
 }
+
+/* ---------- Drawing: a plotted survey sheet ---------- */
+function drawTower(x,y,type,r=15){const c=TOWERS[type].color;ctx.lineWidth=3;ctx.strokeStyle=c;ctx.fillStyle='#eef0e8';ctx.beginPath();
+ if(type==='arrow'){ctx.moveTo(x,y-r);ctx.lineTo(x+r,y+r*.8);ctx.lineTo(x-r,y+r*.8);ctx.closePath();}
+ else if(type==='cannon')ctx.rect(x-r+1,y-r+1,2*r-2,2*r-2);
+ else{ctx.moveTo(x,y-r-2);ctx.lineTo(x+r+2,y);ctx.lineTo(x,y+r+2);ctx.lineTo(x-r-2,y);ctx.closePath();}
+ ctx.fill();ctx.stroke();ctx.fillStyle=c;ctx.beginPath();ctx.arc(x,y,3,0,7);ctx.fill();}
+function ring(x,y,r,color){ctx.setLineDash([6,5]);ctx.lineWidth=1.5;ctx.strokeStyle=color;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.stroke();ctx.setLineDash([]);}
 function render(){
- ctx.clearRect(0,0,W,H);
- // Subtle starfield and grid
- ctx.fillStyle='#080e17';ctx.fillRect(0,0,W,H);
- for(let i=0;i<65;i++){const x=(i*173+37)%W,y=(i*97+19)%H;ctx.fillStyle='rgba(125,170,205,.18)';ctx.fillRect(x,y,2,2);}
- ctx.strokeStyle='#17283a';ctx.lineWidth=1;for(let c=0;c<=COLS;c++){ctx.beginPath();ctx.moveTo(c*CELL,0);ctx.lineTo(c*CELL,H);ctx.stroke();}for(let r=0;r<=ROWS;r++){ctx.beginPath();ctx.moveTo(0,r*CELL);ctx.lineTo(W,r*CELL);ctx.stroke();}
- // Core keep-out zone
- ctx.fillStyle='rgba(87,230,209,.07)';ctx.fillRect(9*CELL,5*CELL,2*CELL,2*CELL);
- ctx.strokeStyle='rgba(87,230,209,.3)';ctx.strokeRect(9*CELL+4,5*CELL+4,2*CELL-8,2*CELL-8);
- // Range preview while selecting, lightly show nearby tower coverage
- for(const t of state.towers){const d=TOWERS[t.type],x=t.col*CELL+CELL/2,y=t.row*CELL+CELL/2;ctx.beginPath();ctx.arc(x,y,d.range,0,Math.PI*2);ctx.fillStyle=t.type==='frost'?'rgba(103,217,255,.025)':'rgba(87,230,209,.018)';ctx.fill();ctx.strokeStyle='rgba(130,180,215,.07)';ctx.stroke();}
- // Towers
- for(const t of state.towers){const d=TOWERS[t.type],x=t.col*CELL+CELL/2,y=t.row*CELL+CELL/2;ctx.fillStyle='#14273a';ctx.beginPath();ctx.arc(x,y,20,0,Math.PI*2);ctx.fill();ctx.strokeStyle=d.color;ctx.lineWidth=3;ctx.stroke();ctx.fillStyle=d.color;ctx.font='bold 20px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(d.glyph,x,y+1);ctx.textAlign='start';}
- // Enemies and health
- for(const z of state.enemies){ctx.fillStyle=performance.now()<z.slowUntil?'#67d9ff':'#a7ef72';ctx.beginPath();ctx.arc(z.x,z.y,z.radius,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#142033';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='#263447';ctx.fillRect(z.x-14,z.y-21,28,4);ctx.fillStyle='#ff657a';ctx.fillRect(z.x-14,z.y-21,28*Math.max(0,z.hp/z.maxHp),4);}
- // Projectiles
- for(const b of state.shots){ctx.fillStyle=TOWERS[b.type].color;ctx.beginPath();ctx.arc(b.x,b.y,b.type==='cannon'?5:3,0,Math.PI*2);ctx.fill();}
- // Core
- const cx=W/2,cy=H/2;ctx.save();ctx.shadowColor='#57e6d1';ctx.shadowBlur=22;ctx.fillStyle='#153f49';ctx.beginPath();ctx.arc(cx,cy,25,0,Math.PI*2);ctx.fill();ctx.restore();ctx.strokeStyle='#8dfff0';ctx.lineWidth=3;ctx.stroke();ctx.fillStyle='#eaffff';ctx.font='bold 16px system-ui';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText('◆',cx,cy);ctx.textAlign='start';
- if(state.gameOver){ctx.fillStyle='rgba(4,8,15,.76)';ctx.fillRect(0,0,W,H);ctx.textAlign='center';ctx.fillStyle='#ff657a';ctx.font='800 42px system-ui';ctx.fillText('CORE BREACHED',W/2,H/2-8);ctx.fillStyle='#e5edf8';ctx.font='18px system-ui';ctx.fillText('The host can restart the match.',W/2,H/2+28);ctx.textAlign='start';}
+ ctx.fillStyle='#e6e9e0';ctx.fillRect(0,0,W,H);ctx.lineWidth=1;
+ for(let c=0;c<=COLS;c++){ctx.strokeStyle=c%5?'#cdd4ca':'#a5b1a3';ctx.beginPath();ctx.moveTo(c*CELL+.5,0);ctx.lineTo(c*CELL+.5,H);ctx.stroke();}
+ for(let r=0;r<=ROWS;r++){ctx.strokeStyle=r%5?'#cdd4ca':'#a5b1a3';ctx.beginPath();ctx.moveTo(0,r*CELL+.5);ctx.lineTo(W,r*CELL+.5);ctx.stroke();}
+ ctx.fillStyle='#8a9a8d';ctx.font='11px Archivo,system-ui,sans-serif';ctx.textBaseline='top';
+ for(let c=0;c<COLS;c++)ctx.fillText(String.fromCharCode(65+c),c*CELL+4,3);for(let r=1;r<ROWS;r++)ctx.fillText(r+1,4,r*CELL+3);
+ ctx.setLineDash([4,4]);ctx.strokeStyle='#5d6d64';ctx.strokeRect(9*CELL+4,5*CELL+4,2*CELL-8,2*CELL-8);ctx.setLineDash([]);
+ // hover preview
+ if(hover&&!state.gameOver&&hover.col>=0&&hover.row>=0&&hover.col<COLS&&hover.row<ROWS&&!state.towers.some(t=>t.col===hover.col&&t.row===hover.row)){
+  const ok=!why(hover.col,hover.row,tool),x=hover.col*CELL+CELL/2,y=hover.row*CELL+CELL/2;
+  ctx.fillStyle=ok?'rgba(43,73,163,.14)':'rgba(217,83,30,.18)';ctx.fillRect(hover.col*CELL,hover.row*CELL,CELL,CELL);
+  if(ok)ring(x,y,TOWERS[tool].range,TOWERS[tool].color);}
+ if(insp){const t=state.towers.find(t=>t.col===insp.col&&t.row===insp.row);if(t)ring(t.col*CELL+CELL/2,t.row*CELL+CELL/2,TOWERS[t.type].range,TOWERS[t.type].color);}
+ for(const t of state.towers)drawTower(t.col*CELL+CELL/2,t.row*CELL+CELL/2,t.type);
+ // enemies (clients ease toward each snapshot so motion stays smooth)
+ for(const z of state.enemies){let x=z.x,y=z.y;
+  if(!isHost){let d=disp.get(z.id);if(!d){d={x,y};disp.set(z.id,d);}d.x+=(x-d.x)*.3;d.y+=(y-d.y)*.3;x=d.x;y=d.y;}
+  const slow=z.slow??performance.now()<z.slowUntil;
+  ctx.fillStyle=slow?'#7fa6d9':'#d9531e';ctx.strokeStyle='#1b2a25';ctx.lineWidth=2;ctx.beginPath();ctx.arc(x,y,z.radius,0,7);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.moveTo(x-5,y-5);ctx.lineTo(x+5,y+5);ctx.moveTo(x+5,y-5);ctx.lineTo(x-5,y+5);ctx.stroke();
+  ctx.fillStyle='#b4bfb2';ctx.fillRect(x-14,y-22,28,4);ctx.fillStyle='#1b2a25';ctx.fillRect(x-14,y-22,28*Math.max(0,z.hp/z.maxHp),4);}
+ for(const b of state.shots){ctx.fillStyle=TOWERS[b.type].color;ctx.beginPath();ctx.arc(b.x,b.y,b.type==='cannon'?5:3,0,7);ctx.fill();}
+ // core
+ const cx=W/2,cy=H/2;ctx.strokeStyle='#1b2a25';ctx.lineWidth=3;ctx.fillStyle='#eef0e8';ctx.beginPath();ctx.arc(cx,cy,28,0,7);ctx.fill();ctx.stroke();
+ ctx.fillStyle='#1b2a25';ctx.beginPath();ctx.arc(cx,cy,12,0,7);ctx.fill();ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(cx-40,cy);ctx.lineTo(cx+40,cy);ctx.moveTo(cx,cy-40);ctx.lineTo(cx,cy+40);ctx.stroke();
+ if(state.gameOver){ctx.fillStyle='rgba(230,233,224,.86)';ctx.fillRect(0,0,W,H);ctx.textAlign='center';ctx.fillStyle='#d9531e';ctx.font='800 56px Archivo,system-ui,sans-serif';ctx.textBaseline='alphabetic';ctx.fillText('Core breached',W/2,H/2);ctx.fillStyle='#1b2a25';ctx.font='20px Archivo,system-ui,sans-serif';ctx.fillText(`You held out for ${state.wave} wave${state.wave===1?'':'s'} and ${state.kills} kills.`,W/2,H/2+36);ctx.textAlign='start';}
 }
-window.addEventListener('beforeunload',()=>cleanupPeer(false));
+addEventListener('beforeunload',closePeer);
 </script>
 </body>
 </html>
