@@ -3,11 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Platform Brawler</title>
+  <title>Top-Down WebRTC Arena Shooter</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      background: #09090e;
+      background: #08080c;
       color: #f0f0f5;
       font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       display: flex;
@@ -19,139 +19,123 @@
     h1 {
       margin-bottom: 20px;
       font-size: 2.2rem;
-      background: linear-gradient(45deg, #ff3366, #ff9933);
+      background: linear-gradient(45deg, #00ffcc, #0088ff);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
-      text-shadow: 0 0 30px rgba(255, 51, 102, 0.3);
+      text-shadow: 0 0 30px rgba(0, 255, 204, 0.3);
       letter-spacing: 1px;
     }
     #lobby {
-      background: #14141c;
+      background: #12121c;
       padding: 25px;
       border-radius: 12px;
       width: 100%;
-      max-width: 700px;
-      box-shadow: 0 8px 30px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.05);
-      border: 1px solid #222230;
+      max-width: 650px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.6);
+      border: 1px solid #1f1f2e;
       margin-bottom: 25px;
     }
     .step { margin-bottom: 16px; }
-    label { display: block; font-weight: 600; margin-bottom: 6px; color: #b0b0c0; font-size: 0.9rem; }
+    label { display: block; font-weight: 600; margin-bottom: 6px; color: #a0a0b0; font-size: 0.9rem; }
     textarea {
       width: 100%;
-      height: 70px;
-      background: #09090e;
+      height: 65px;
+      background: #08080c;
       border: 1px solid #2a2a3d;
       color: #00ffcc;
-      font-family: 'Courier New', Courier, monospace;
-      font-size: 0.8rem;
+      font-family: monospace;
+      font-size: 0.75rem;
       padding: 10px;
       border-radius: 6px;
       resize: none;
       outline: none;
-      transition: border-color 0.2s;
     }
-    textarea:focus { border-color: #ff3366; }
+    textarea:focus { border-color: #00ffcc; }
     .btn-group { display: flex; gap: 12px; margin-bottom: 20px; }
     button {
       flex: 1;
       padding: 12px;
       border: none;
       border-radius: 6px;
-      background: linear-gradient(135deg, #ff3366, #ff1a47);
-      color: white;
+      background: linear-gradient(135deg, #00ffcc, #0099ff);
+      color: #08080c;
       font-weight: bold;
       font-size: 1rem;
       cursor: pointer;
-      box-shadow: 0 4px 15px rgba(255, 51, 102, 0.4);
+      box-shadow: 0 4px 15px rgba(0, 255, 204, 0.3);
       transition: all 0.2s;
     }
-    button:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(255, 51, 102, 0.6); }
-    button:active { transform: translateY(1px); }
-    button:disabled { background: #252533; box-shadow: none; color: #666; cursor: not-allowed; }
-    .sub-btn { flex: none; padding: 6px 14px; margin-top: 6px; background: #222233; font-size: 0.85rem; box-shadow: none; }
-    .sub-btn:hover { background: #2f2f45; }
+    button:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0, 255, 204, 0.5); }
+    button:disabled { background: #222233; color: #555; box-shadow: none; cursor: not-allowed; }
+    .sub-btn { flex: none; padding: 6px 14px; margin-top: 6px; background: #1c1c2b; color: #fff; font-size: 0.85rem; box-shadow: none; }
+    .sub-btn:hover { background: #28283d; }
     #gameContainer {
       display: none;
       flex-direction: column;
       align-items: center;
-      animation: fadeIn 0.4s ease-out;
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; transform: scale(0.98); }
-      to { opacity: 1; transform: scale(1); }
     }
     canvas {
-      border: 3px solid #222233;
+      border: 3px solid #1f1f2e;
       border-radius: 10px;
-      background: radial-gradient(circle at center, #151522 0%, #07070a 100%);
+      background: #0d0d14;
       box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+      cursor: crosshair;
     }
     #status {
       margin-top: 12px;
       font-weight: 600;
-      color: #ffca28;
+      color: #ffcc00;
       font-size: 0.95rem;
       text-align: center;
     }
     .controls-hint {
       margin-top: 15px;
-      font-size: 0.9rem;
-      color: #9999aa;
+      font-size: 0.85rem;
+      color: #888899;
       text-align: center;
-      background: #14141c;
+      background: #12121c;
       padding: 10px 20px;
       border-radius: 6px;
-      border: 1px solid #222230;
+      border: 1px solid #1f1f2e;
     }
-    .key {
-      background: #252536;
-      color: #ff3366;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-family: monospace;
-      font-weight: bold;
-      border: 1px solid #3d3d5c;
-    }
+    .key { background: #1c1c2b; color: #00ffcc; padding: 2px 6px; border-radius: 4px; font-family: monospace; font-weight: bold; }
   </style>
 </head>
 <body>
 
-  <h1>⚡ ASTRAL BRAWL ⚡</h1>
+  <h1>🎯 P2P TOP-DOWN ARENA</h1>
 
   <div id="lobby">
     <div class="btn-group">
-      <button id="btnHost" onclick="startHost()">1. Host Arena</button>
-      <button id="btnJoin" onclick="startJoin()">1. Join Arena</button>
+      <button id="btnHost" onclick="startHost()">1. Host Game</button>
+      <button id="btnJoin" onclick="startJoin()">1. Join Game</button>
     </div>
 
     <div class="step">
-      <label>Your Connection Code (Copy & send to opponent):</label>
+      <label>Step 2: Copy your connection code and send it to your peer:</label>
       <textarea id="localSDP" readonly placeholder="Click Host or Join above..."></textarea>
       <button class="sub-btn" onclick="copySDP()">Copy Code</button>
     </div>
 
     <div class="step">
-      <label>Peer Connection Code (Paste opponent's code here):</label>
-      <textarea id="remoteSDP" placeholder="Paste code from your opponent..."></textarea>
-      <button id="btnAccept" class="sub-btn" onclick="acceptRemoteSDP()">2. Establish Connection</button>
+      <label>Step 3: Paste your peer's code here and click Connect:</label>
+      <textarea id="remoteSDP" placeholder="Paste peer code here..."></textarea>
+      <button id="btnAccept" class="sub-btn" onclick="acceptRemoteSDP()">Connect Peer Code</button>
     </div>
 
-    <div id="status">Status: Choose an option to start setup...</div>
+    <div id="status">Status: Ready. Choose Host or Join.</div>
   </div>
 
   <div id="gameContainer">
-    <canvas id="canvas" width="850" height="480"></canvas>
+    <canvas id="canvas" width="800" height="500"></canvas>
     <div class="controls-hint">
-      Move: <span class="key">A</span> <span class="key">D</span> &nbsp;|&nbsp; 
-      Jump / Double Jump: <span class="key">W</span> or <span class="key">Space</span> &nbsp;|&nbsp; 
-      Attack: <span class="key">J</span> or <span class="key">Z</span> &nbsp;|&nbsp; 
-      Dash: <span class="key">K</span> or <span class="key">X</span>
+      Move: <span class="key">W</span><span class="key">A</span><span class="key">S</span><span class="key">D</span> &nbsp;|&nbsp; 
+      Aim: Mouse &nbsp;|&nbsp; Shoot: Left Click
     </div>
   </div>
 
 <script>
-  // --- WebRTC Signaling & Connection Setup ---
+  // --- Bulletproof WebRTC Signaling ---
   const config = { iceServers: [{ urls: "stun:stun.l.google.com:19020" }] };
   let pc, dataChannel;
   let isHost = false;
@@ -160,24 +144,32 @@
   const localSDPEl = document.getElementById('localSDP');
   const remoteSDPEl = document.getElementById('remoteSDP');
 
-  function resetConnection() {
+  function initPeerConnection() {
     if (pc) pc.close();
     pc = new RTCPeerConnection(config);
-    
+
+    // As candidates gather, update local SDP text automatically
     pc.onicecandidate = (e) => {
       if (pc.localDescription) {
         localSDPEl.value = JSON.stringify(pc.localDescription);
       }
     };
+
+    pc.onconnectionstatechange = () => {
+      statusEl.innerText = `Connection State: ${pc.connectionState}`;
+      if (pc.connectionState === 'connected') {
+        launchGame();
+      }
+    };
   }
 
   async function startHost() {
-    resetConnection();
     isHost = true;
     document.getElementById('btnJoin').disabled = true;
     statusEl.innerText = "Status: Hosting... Generating offer code.";
+    initPeerConnection();
 
-    dataChannel = pc.createDataChannel("game");
+    dataChannel = pc.createDataChannel("gameData");
     setupDataChannel();
 
     const offer = await pc.createOffer();
@@ -186,10 +178,10 @@
   }
 
   async function startJoin() {
-    resetConnection();
     isHost = false;
     document.getElementById('btnHost').disabled = true;
     statusEl.innerText = "Status: Joining... Paste Host code below.";
+    initPeerConnection();
 
     pc.ondatachannel = (e) => {
       dataChannel = e.channel;
@@ -199,7 +191,7 @@
 
   async function acceptRemoteSDP() {
     const rawSDP = remoteSDPEl.value.trim();
-    if (!rawSDP) return alert("Please paste a connection code first!");
+    if (!rawSDP) return alert("Please paste a valid peer code first!");
 
     try {
       const desc = new RTCSessionDescription(JSON.parse(rawSDP));
@@ -209,27 +201,22 @@
         const answer = await pc.createAnswer();
         await pc.setLocalDescription(answer);
         localSDPEl.value = JSON.stringify(pc.localDescription);
-        statusEl.innerText = "Status: Answer generated! Copy back to Host.";
+        statusEl.innerText = "Status: Answer generated! Copy your code back to the Host.";
       } else {
-        statusEl.innerText = "Status: Connecting to peer...";
+        statusEl.innerText = "Status: Processing peer answer... Establishing connection.";
       }
-    } catch(err) {
-      alert("Invalid connection code structure. Check code and try again.");
+    } catch (err) {
+      console.error(err);
+      alert("Invalid code format! Make sure you copied the entire block.");
     }
   }
 
   function setupDataChannel() {
-    dataChannel.onopen = () => {
-      statusEl.innerText = "Status: Connected! Launching battle arena...";
-      document.getElementById('lobby').style.display = 'none';
-      document.getElementById('gameContainer').style.display = 'flex';
-      initGame();
-    };
-
+    dataChannel.onopen = () => launchGame();
     dataChannel.onmessage = (e) => {
       const msg = JSON.parse(e.data);
       if (isHost && msg.type === 'input') {
-        clientInputs = msg.keys;
+        clientInput = msg.data;
       } else if (!isHost && msg.type === 'state') {
         gameState = msg.state;
       }
@@ -242,323 +229,217 @@
     alert("Connection code copied to clipboard!");
   }
 
-  // --- Game Engine, Particles & Juice ---
+  function launchGame() {
+    statusEl.innerText = "Status: Connected! Launching arena...";
+    document.getElementById('lobby').style.display = 'none';
+    document.getElementById('gameContainer').style.display = 'flex';
+    initGame();
+  }
+
+  // --- Top-Down Game Engine ---
   const canvas = document.getElementById('canvas');
   const ctx = canvas.getContext('2d');
 
-  let localKeys = {};
-  let clientInputs = {};
-  let particles = [];
-  let screenShakeTimer = 0;
-  let screenShakeIntensity = 0;
+  let keys = {};
+  let mouse = { x: 400, y: 250, down: false };
+  let clientInput = { keys: {}, angle: 0, shoot: false };
 
-  const STAGE = { x: 175, y: 320, width: 500, height: 22 };
-  const GRAVITY = 0.52;
-
+  // Game world state managed by Host
   let gameState = {
     players: {
-      host:   createPlayer(260, 200, '#00ffcc', 1),
-      client: createPlayer(590, 200, '#ff3366', -1)
-    }
+      host:   { x: 150, y: 250, angle: 0, score: 0, color: '#00ffcc', hp: 100 },
+      client: { x: 650, y: 250, angle: 0, score: 0, color: '#ff0066', hp: 100 }
+    },
+    bullets: []
   };
 
-  function createPlayer(x, y, color, facing) {
-    return {
-      x, y, vx: 0, vy: 0,
-      width: 30, height: 46,
-      color, facing,
-      damage: 0, stocks: 3,
-      isGrounded: false, jumpsLeft: 2,
-      isAttacking: false, attackTimer: 0,
-      isDashing: false, dashTimer: 0, dashCooldown: 0,
-      hitCooldown: 0
-    };
-  }
-
-  window.addEventListener('keydown', e => {
-    if ((e.code === 'KeyW' || e.code === 'ArrowUp' || e.code === 'Space') && !localKeys[e.code]) {
-      localKeys['jumpPressed'] = true;
-    }
-    localKeys[e.code] = true;
+  window.addEventListener('keydown', e => keys[e.code] = true);
+  window.addEventListener('keyup', e => keys[e.code] = false);
+  canvas.addEventListener('mousemove', e => {
+    const rect = canvas.getBoundingClientRect();
+    mouse.x = e.clientX - rect.left;
+    mouse.y = e.clientY - rect.top;
   });
-
-  window.addEventListener('keyup', e => {
-    localKeys[e.code] = false;
-  });
+  canvas.addEventListener('mousedown', () => mouse.down = true);
+  canvas.addEventListener('mouseup', () => mouse.down = false);
 
   function initGame() {
     requestAnimationFrame(gameLoop);
   }
 
   function gameLoop() {
+    // Calculate local player aim angle based on mouse
+    let myPlayer = isHost ? gameState.players.host : gameState.players.client;
+    let dx = mouse.x - myPlayer.x;
+    let dy = mouse.y - myPlayer.y;
+    let aimAngle = Math.atan2(dy, dx);
+
     if (isHost) {
-      updateHost();
+      // Host updates physics and authoritative state
+      updateHost({ keys, angle: aimAngle, shoot: mouse.down });
+
+      // Send state to client
       if (dataChannel?.readyState === 'open') {
         dataChannel.send(JSON.stringify({ type: 'state', state: gameState }));
       }
-      localKeys['jumpPressed'] = false;
     } else {
+      // Client sends inputs to host
       if (dataChannel?.readyState === 'open') {
-        dataChannel.send(JSON.stringify({ type: 'input', keys: localKeys }));
+        dataChannel.send(JSON.stringify({
+          type: 'input',
+          data: { keys, angle: aimAngle, shoot: mouse.down }
+        }));
       }
-      localKeys['jumpPressed'] = false;
     }
 
     render();
     requestAnimationFrame(gameLoop);
   }
 
-  function triggerShake(intensity, duration) {
-    screenShakeIntensity = intensity;
-    screenShakeTimer = duration;
+  function updateHost(hostInput) {
+    // Update Host Player
+    updatePlayerPhysics(gameState.players.host, hostInput.keys, hostInput.angle);
+    if (hostInput.shoot) {
+      tryShoot('host', gameState.players.host);
+    }
+
+    // Update Client Player
+    updatePlayerPhysics(gameState.players.client, clientInput.keys || {}, clientInput.angle || 0);
+    if (clientInput.shoot) {
+      tryShoot('client', gameState.players.client);
+    }
+
+    // Update Bullets
+    for (let i = gameState.bullets.length - 1; i >= 0; i--) {
+      let b = gameState.bullets[i];
+      b.x += Math.cos(b.angle) * b.speed;
+      b.y += Math.sin(b.angle) * b.speed;
+      b.life--;
+
+      // Check wall bounds
+      if (b.x < 0 || b.x > canvas.width || b.y < 0 || b.y > canvas.height || b.life <= 0) {
+        gameState.bullets.splice(i, 1);
+        continue;
+      }
+
+      // Check player hits
+      for (let id in gameState.players) {
+        if (id !== b.owner) {
+          let p = gameState.players[id];
+          let dist = Math.hypot(p.x - b.x, p.y - b.y);
+          if (dist < 16) {
+            p.hp -= 15;
+            gameState.bullets.splice(i, 1);
+
+            if (p.hp <= 0) {
+              // Award score to shooter and respawn
+              gameState.players[b.owner].score++;
+              p.hp = 100;
+              p.x = id === 'host' ? 150 : 650;
+              p.y = 250;
+            }
+            break;
+          }
+        }
+      }
+    }
   }
 
-  function addParticles(x, y, color, count = 10) {
-    for (let i = 0; i < count; i++) {
-      const angle = Math.random() * Math.PI * 2;
-      const speed = 2 + Math.random() * 6;
-      particles.push({
-        x, y,
-        vx: Math.cos(angle) * speed,
-        vy: Math.sin(angle) * speed,
-        alpha: 1,
-        decay: 0.03 + Math.random() * 0.04,
-        color,
-        size: 2 + Math.random() * 3
+  function updatePlayerPhysics(p, pKeys, angle) {
+    p.angle = angle;
+    const speed = 3.5;
+    let vx = 0, vy = 0;
+
+    if (pKeys['KeyW'] || pKeys['ArrowUp']) vy -= speed;
+    if (pKeys['KeyS'] || pKeys['ArrowDown']) vy += speed;
+    if (pKeys['KeyA'] || pKeys['ArrowLeft']) vx -= speed;
+    if (pKeys['KeyD'] || pKeys['ArrowRight']) vx += speed;
+
+    p.x += vx;
+    p.y += vy;
+
+    // Boundary constraints
+    p.x = Math.max(20, Math.min(canvas.width - 20, p.x));
+    p.y = Math.max(20, Math.min(canvas.height - 20, p.y));
+  }
+
+  function tryShoot(id, p) {
+    const now = Date.now();
+    if (!p.lastShot || now - p.lastShot > 250) { // 250ms fire cooldown
+      p.lastShot = now;
+      gameState.bullets.push({
+        x: p.x + Math.cos(p.angle) * 22,
+        y: p.y + Math.sin(p.angle) * 22,
+        angle: p.angle,
+        speed: 9,
+        life: 80,
+        owner: id
       });
     }
   }
 
-  function updateHost() {
-    updateFighter('host', localKeys);
-    updateFighter('client', clientInputs);
-
-    checkAttacks(gameState.players.host, gameState.players.client);
-    checkAttacks(gameState.players.client, gameState.players.host);
-  }
-
-  function updateFighter(id, keys) {
-    let p = gameState.players[id];
-    if (!keys) return;
-
-    const accel = p.isGrounded ? 0.85 : 0.45;
-    const maxSpeed = 6.2;
-
-    if (keys['KeyA'] || keys['ArrowLeft']) {
-      p.vx -= accel;
-      p.facing = -1;
-    } else if (keys['KeyD'] || keys['ArrowRight']) {
-      p.vx += accel;
-      p.facing = 1;
-    } else if (p.isGrounded && !p.isDashing) {
-      p.vx *= 0.78; // Ground friction
-    }
-
-    p.vx = Math.max(-maxSpeed, Math.min(maxSpeed, p.vx));
-
-    // Jump / Double Jump
-    if (keys['jumpPressed'] && p.jumpsLeft > 0) {
-      p.vy = -11.5;
-      p.jumpsLeft--;
-      p.isGrounded = false;
-      keys['jumpPressed'] = false;
-      addParticles(p.x + p.width/2, p.y + p.height, '#ffffff', 6);
-    }
-
-    // Dash
-    if (p.dashCooldown > 0) p.dashCooldown--;
-    if ((keys['KeyK'] || keys['KeyX']) && p.dashCooldown === 0) {
-      p.isDashing = true;
-      p.dashTimer = 11;
-      p.dashCooldown = 40;
-      p.vx = p.facing * 15;
-      p.vy = 0;
-      addParticles(p.x + p.width/2, p.y + p.height/2, p.color, 8);
-    }
-
-    if (p.isDashing) {
-      p.dashTimer--;
-      if (p.dashTimer <= 0) p.isDashing = false;
-    } else {
-      p.vy += GRAVITY;
-    }
-
-    // Attack
-    if (p.attackTimer > 0) p.attackTimer--;
-    if (p.hitCooldown > 0) p.hitCooldown--;
-
-    if ((keys['KeyJ'] || keys['KeyZ']) && p.attackTimer === 0) {
-      p.isAttacking = true;
-      p.attackTimer = 16;
-    } else if (p.attackTimer < 8) {
-      p.isAttacking = false;
-    }
-
-    p.x += p.vx;
-    p.y += p.vy;
-
-    // Platform Collisions
-    p.isGrounded = false;
-    if (
-      p.x + p.width > STAGE.x &&
-      p.x < STAGE.x + STAGE.width &&
-      p.y + p.height >= STAGE.y &&
-      p.y + p.height <= STAGE.y + 16 &&
-      p.vy >= 0
-    ) {
-      p.y = STAGE.y - p.height;
-      p.vy = 0;
-      p.isGrounded = true;
-      p.jumpsLeft = 2;
-    }
-
-    // Respawn / Blast Zone Check
-    if (p.y > canvas.height + 120 || p.x < -120 || p.x > canvas.width + 120 || p.y < -160) {
-      p.stocks--;
-      p.damage = 0;
-      p.x = id === 'host' ? 260 : 590;
-      p.y = 150;
-      p.vx = 0;
-      p.vy = 0;
-      triggerShake(10, 20);
-      addParticles(p.x + p.width/2, p.y + p.height/2, '#ffaa00', 25);
-    }
-  }
-
-  function checkAttacks(attacker, defender) {
-    if (!attacker.isAttacking || defender.hitCooldown > 0) return;
-
-    const hitbox = {
-      x: attacker.facing === 1 ? attacker.x + attacker.width : attacker.x - 34,
-      y: attacker.y + 4,
-      width: 34,
-      height: attacker.height - 8
-    };
-
-    if (
-      hitbox.x < defender.x + defender.width &&
-      hitbox.x + hitbox.width > defender.x &&
-      hitbox.y < defender.y + defender.height &&
-      hitbox.y + hitbox.height > defender.y
-    ) {
-      defender.damage += 14;
-      defender.hitCooldown = 22;
-
-      const knockback = 6 + (defender.damage * 0.17);
-      defender.vx = attacker.facing * knockback;
-      defender.vy = -knockback * 0.55;
-
-      triggerShake(6, 12);
-      addParticles(defender.x + defender.width/2, defender.y + defender.height/2, '#ffee55', 15);
-    }
-  }
-
   function render() {
-    ctx.save();
-
-    // Apply Screen Shake
-    if (screenShakeTimer > 0) {
-      screenShakeTimer--;
-      const offsetX = (Math.random() - 0.5) * screenShakeIntensity;
-      const offsetY = (Math.random() - 0.5) * screenShakeIntensity;
-      ctx.translate(offsetX, offsetY);
-    }
-
     ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Draw Background Grid Lines / Stars
-    ctx.strokeStyle = '#1b1b29';
+    // Draw grid background
+    ctx.strokeStyle = '#151522';
     ctx.lineWidth = 1;
-    for (let i = 0; i < canvas.width; i += 40) {
-      ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+    for (let x = 0; x < canvas.width; x += 40) {
+      ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
     }
-    for (let j = 0; j < canvas.height; j += 40) {
-      ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(canvas.width, j); ctx.stroke();
-    }
-
-    // Draw Floating Stage with Glow
-    ctx.shadowBlur = 15;
-    ctx.shadowColor = '#ff3366';
-    ctx.fillStyle = '#1c1c2b';
-    ctx.fillRect(STAGE.x, STAGE.y, STAGE.width, STAGE.height);
-    ctx.fillStyle = '#ff3366';
-    ctx.fillRect(STAGE.x, STAGE.y, STAGE.width, 5);
-    ctx.shadowBlur = 0; // Reset shadow
-
-    // Draw Particles
-    for (let i = particles.length - 1; i >= 0; i--) {
-      let pt = particles[i];
-      pt.x += pt.vx;
-      pt.y += pt.vy;
-      pt.alpha -= pt.decay;
-      if (pt.alpha <= 0) {
-        particles.splice(i, 1);
-        continue;
-      }
-      ctx.fillStyle = pt.color;
-      ctx.globalAlpha = pt.alpha;
-      ctx.fillRect(pt.x, pt.y, pt.size, pt.size);
-      ctx.globalAlpha = 1.0;
+    for (let y = 0; y < canvas.height; y += 40) {
+      ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
     }
 
-    // Draw HUD / Scoreboards
-    drawHUD('HOST', gameState.players.host, 140);
-    drawHUD('CLIENT', gameState.players.client, canvas.width - 240);
+    // Draw Scores & Health Bars
+    drawHUD('HOST', gameState.players.host, 30, 30);
+    drawHUD('CLIENT', gameState.players.client, canvas.width - 180, 30);
+
+    // Draw Bullets
+    ctx.fillStyle = '#ffcc00';
+    for (let b of gameState.bullets) {
+      ctx.beginPath();
+      ctx.arc(b.x, b.y, 4, 0, Math.PI * 2);
+      ctx.fill();
+    }
 
     // Draw Players
     for (let id in gameState.players) {
-      const p = gameState.players[id];
-
+      let p = gameState.players[id];
       ctx.save();
-      if (p.hitCooldown % 4 > 2) ctx.globalAlpha = 0.4;
+      ctx.translate(p.x, p.y);
+      ctx.rotate(p.angle);
 
-      // Player Glow
-      ctx.shadowBlur = 12;
-      ctx.shadowColor = p.color;
+      // Gun Barrel
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, -3, 22, 6);
 
-      // Body Box
+      // Body Circle
       ctx.fillStyle = p.color;
-      ctx.fillRect(p.x, p.y, p.width, p.height);
-
-      // Visor / Face direction indicator
-      ctx.shadowBlur = 0;
-      ctx.fillStyle = '#09090e';
-      const visorX = p.facing === 1 ? p.x + p.width - 10 : p.x + 4;
-      ctx.fillRect(visorX, p.y + 9, 6, 8);
-
-      // Attack Hitbox FX
-      if (p.isAttacking) {
-        ctx.fillStyle = '#ffffff';
-        ctx.shadowBlur = 15;
-        ctx.shadowColor = '#ffff00';
-        const punchX = p.facing === 1 ? p.x + p.width : p.x - 28;
-        ctx.fillRect(punchX, p.y + 12, 28, 14);
-      }
+      ctx.beginPath();
+      ctx.arc(0, 0, 16, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.lineWidth = 3;
+      ctx.strokeStyle = '#ffffff';
+      ctx.stroke();
 
       ctx.restore();
     }
-
-    ctx.restore();
   }
 
-  function drawHUD(label, player, x) {
-    ctx.fillStyle = '#b0b0c0';
-    ctx.font = 'bold 13px system-ui';
-    ctx.fillText(label, x, 32);
+  function drawHUD(label, player, x, y) {
+    ctx.fillStyle = '#a0a0b0';
+    ctx.font = 'bold 12px system-ui';
+    ctx.fillText(`${label} - Score: ${player.score}`, x, y);
 
-    // Damage Percentage
-    ctx.font = 'bold 26px system-ui';
-    ctx.fillStyle = player.damage > 80 ? '#ff3333' : '#ffffff';
-    ctx.fillText(`${player.damage}%`, x, 62);
+    // Health Bar Outline
+    ctx.strokeStyle = '#33334d';
+    ctx.lineWidth = 2;
+    ctx.strokeRect(x, y + 6, 150, 12);
 
-    // Stock Life Icons
-    for (let i = 0; i < player.stocks; i++) {
-      ctx.fillStyle = player.color;
-      ctx.shadowBlur = 6;
-      ctx.shadowColor = player.color;
-      ctx.fillRect(x + (i * 20), 72, 14, 14);
-      ctx.shadowBlur = 0;
-    }
+    // Health Fill
+    ctx.fillStyle = player.color;
+    ctx.fillRect(x, y + 6, 150 * (Math.max(0, player.hp) / 100), 12);
   }
 </script>
 </body>
