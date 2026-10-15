@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>2D WebRTC Serverless Brawler</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0f0f13;
+      color: #e0e0e0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+    h1 { margin-bottom: 15px; font-size: 1.8rem; color: #ff3366; }
+    #lobby {
+      background: #181820;
+      padding: 20px;
+      border-radius: 8px;
+      width: 100%;
+      max-width: 650px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      margin-bottom: 20px;
+    }
+    .step { margin-bottom: 12px; }
+    label { display: block; font-weight: bold; margin-bottom: 5px; color: #aaa; font-size: 0.9rem; }
+    textarea {
+      width: 100%;
+      height: 60px;
+      background: #0f0f13;
+      border: 1px solid #333;
+      color: #00ffcc;
+      font-family: monospace;
+      font-size: 0.75rem;
+      padding: 8px;
+      border-radius: 4px;
+      resize: none;
+    }
+    .btn-group { display: flex; gap: 10px; margin-bottom: 15px; }
+    button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 4px;
+      background: #ff3366;
+      color: white;
+      font-weight: bold;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+    button:hover { opacity: 0.9; }
+    button:disabled { background: #444; cursor: not-allowed; }
+    .sub-btn { flex: none; padding: 5px 12px; margin-top: 4px; background: #2a2a35; }
+    #gameContainer {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+    canvas {
+      border: 2px solid #333;
+      border-radius: 6px;
+      background: #07070a;
+      box-shadow: 0 0 25px rgba(0,0,0,0.8);
+    }
+    #status { margin-top: 8px; font-weight: bold; color: #ffca28; }
+    .controls-hint { margin-top: 10px; font-size: 0.85rem; color: #888; text-align: center; }
+  </style>
+</head>
+<body>
+
+  <h1>2D WebRTC Platform Brawler</h1>
+
+  <div id="lobby">
+    <div class="btn-group">
+      <button id="btnHost" onclick="startHost()">1. Host Fight</button>
+      <button id="btnJoin" onclick="startJoin()">1. Join Fight</button>
+    </div>
+
+    <div class="step">
+      <label>Your Connection Code (Copy & send to peer):</label>
+      <textarea id="localSDP" readonly placeholder="Click Host or Join above..."></textarea>
+      <button class="sub-btn" onclick="copySDP()">Copy Code</button>
+    </div>
+
+    <div class="step">
+      <label>Peer Connection Code (Paste peer's code here):</label>
+      <textarea id="remoteSDP" placeholder="Paste code from opponent..."></textarea>
+      <button id="btnAccept" class="sub-btn" onclick="acceptRemoteSDP()">2. Connect Code</button>
+    </div>
+
+    <div id="status">Status: Waiting to start...</div>
+  </div>
+
+  <div id="gameContainer">
+    <canvas id="canvas" width="800" height="450"></canvas>
+    <div class="controls-hint">
+      [A/D or Left/Right] Move | [W / Up / Space] Jump & Double Jump | [J / Z] Attack | [K / X] Dash
+    </div>
+  </div>
+
+<script>
+  // --- WebRTC Signaling ---
+  const config = { iceServers: [{ urls: "stun:stun.l.google.com:19020" }] };
+  let pc = new RTCPeerConnection(config);
+  let dataChannel = null;
+  let isHost = false;
+
+  const statusEl = document.getElementById('status');
+  const localSDPEl = document.getElementById('localSDP');
+  const remoteSDPEl = document.getElementById('remoteSDP');
+
+  pc.onicecandidate = (e) => {
+    if (!e.candidate) {
+      localSDPEl.value = JSON.stringify(pc.localDescription);
+    }
+  };
+
+  async function startHost() {
+    isHost = true;
+    document.getElementById('btnJoin').disabled = true;
+    statusEl.innerText = "Status: Hosting... Generating offer code.";
+
+    dataChannel = pc.createDataChannel("game");
+    setupDataChannel();
+
+    const offer = await pc.createOffer();
+    await pc.setLocalDescription(offer);
+  }
+
+  async function startJoin() {
+    isHost = false;
+    document.getElementById('btnHost').disabled = true;
+    statusEl.innerText = "Status: Joining... Paste Host code below.";
+
+    pc.ondatachannel = (e) => {
+      dataChannel = e.channel;
+      setupDataChannel();
+    };
+  }
+
+  async function acceptRemoteSDP() {
+    const rawSDP = remoteSDPEl.value.trim();
+    if (!rawSDP) return alert("Paste a connection code first!");
+
+    const desc = new RTCSessionDescription(JSON.parse(rawSDP));
+    await pc.setRemoteDescription(desc);
+
+    if (!isHost && !pc.localDescription) {
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+      statusEl.innerText = "Status: Answer generated! Copy back to Host.";
+    }
+  }
+
+  function setupDataChannel() {
+    dataChannel.onopen = () => {
+      statusEl.innerText = "Status: Connected! Starting fight...";
+      document.getElementById('lobby').style.display = 'none';
+      document.getElementById('gameContainer').style.display = 'flex';
+      initGame();
+    };
+
+    dataChannel.onmessage = (e) => {
+      const msg = JSON.parse(e.data);
+      if (isHost && msg.type === 'input') {
+        clientInputs = msg.keys;
+      } else if (!isHost && msg.type === 'state') {
+        gameState = msg.state;
+      }
+    };
+  }
+
+  function copySDP() {
+    localSDPEl.select();
+    navigator.clipboard.writeText(localSDPEl.value);
+    alert("Connection code copied to clipboard!");
+  }
+
+  // --- Fighting Engine ---
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  let localKeys = {};
+  let clientInputs = {};
+
+  const STAGE = { x: 150, y: 300, width: 500, height: 25 };
+  const GRAVITY = 0.55;
+
+  let gameState = {
+    players: {
+      host:   createPlayer(250, 200, '#00e676', 1),
+      client: createPlayer(550, 200, '#ff3366', -1)
+    }
+  };
+
+  function createPlayer(x, y, color, facing) {
+    return {
+      x, y, vx: 0, vy: 0,
+      width: 28, height: 42,
+      color, facing,
+      damage: 0, stocks: 3,
+      isGrounded: false, jumpsLeft: 2,
+      isAttacking: false, attackTimer: 0,
+      isDashing: false, dashTimer: 0, dashCooldown: 0,
+      hitCooldown: 0
+    };
+  }
+
+  window.addEventListener('keydown', e => {
+    // Jump trigger on press down
+    if ((e.code === 'KeyW' || e.code === 'ArrowUp' || e.code === 'Space') && !localKeys[e.code]) {
+      localKeys['jumpPressed'] = true;
+    }
+    localKeys[e.code] = true;
+  });
+
+  window.addEventListener('keyup', e => {
+    localKeys[e.code] = false;
+  });
+
+  function initGame() {
+    requestAnimationFrame(gameLoop);
+  }
+
+  function gameLoop() {
+    if (isHost) {
+      updateHost();
+      if (dataChannel?.readyState === 'open') {
+        dataChannel.send(JSON.stringify({ type: 'state', state: gameState }));
+      }
+      localKeys['jumpPressed'] = false; // Reset single-frame action
+    } else {
+      if (dataChannel?.readyState === 'open') {
+        dataChannel.send(JSON.stringify({ type: 'input', keys: localKeys }));
+      }
+      localKeys['jumpPressed'] = false;
+    }
+
+    render();
+    requestAnimationFrame(gameLoop);
+  }
+
+  function updateHost() {
+    updateFighter('host', localKeys);
+    updateFighter('client', clientInputs);
+
+    // Collision Check between Fighters
+    checkAttacks(gameState.players.host, gameState.players.client);
+    checkAttacks(gameState.players.client, gameState.players.host);
+  }
+
+  function updateFighter(id, keys) {
+    let p = gameState.players[id];
+    if (!keys) return;
+
+    // Movement Physics
+    const accel = p.isGrounded ? 0.8 : 0.4;
+    const maxSpeed = 6;
+
+    if (keys['KeyA'] || keys['ArrowLeft']) {
+      p.vx -= accel;
+      p.facing = -1;
+    } else if (keys['KeyD'] || keys['ArrowRight']) {
+      p.vx += accel;
+      p.facing = 1;
+    } else if (p.isGrounded && !p.isDashing) {
+      p.vx *= 0.8; // Ground friction
+    }
+
+    p.vx = Math.max(-maxSpeed, Math.min(maxSpeed, p.vx));
+
+    // Jump
+    if (keys['jumpPressed'] && p.jumpsLeft > 0) {
+      p.vy = -11;
+      p.jumpsLeft--;
+      p.isGrounded = false;
+      keys['jumpPressed'] = false;
+    }
+
+    // Dash Action
+    if (p.dashCooldown > 0) p.dashCooldown--;
+    if ((keys['KeyK'] || keys['KeyX']) && p.dashCooldown === 0) {
+      p.isDashing = true;
+      p.dashTimer = 10;
+      p.dashCooldown = 45;
+      p.vx = p.facing * 14;
+      p.vy = 0;
+    }
+
+    if (p.isDashing) {
+      p.dashTimer--;
+      if (p.dashTimer <= 0) p.isDashing = false;
+    } else {
+      p.vy += GRAVITY; // Gravity applied if not dashing
+    }
+
+    // Attacks
+    if (p.attackTimer > 0) p.attackTimer--;
+    if (p.hitCooldown > 0) p.hitCooldown--;
+
+    if ((keys['KeyJ'] || keys['KeyZ']) && p.attackTimer === 0) {
+      p.isAttacking = true;
+      p.attackTimer = 18; // Attack duration & rate
+    } else if (p.attackTimer < 8) {
+      p.isAttacking = false;
+    }
+
+    // Apply Velocity
+    p.x += p.vx;
+    p.y += p.vy;
+
+    // Stage Platform Collisions
+    p.isGrounded = false;
+    if (
+      p.x + p.width > STAGE.x &&
+      p.x < STAGE.x + STAGE.width &&
+      p.y + p.height >= STAGE.y &&
+      p.y + p.height <= STAGE.y + 15 &&
+      p.vy >= 0
+    ) {
+      p.y = STAGE.y - p.height;
+      p.vy = 0;
+      p.isGrounded = true;
+      p.jumpsLeft = 2; // Reset jumps
+    }
+
+    // Blast Zones (Death / Ring Out)
+    if (p.y > canvas.height + 100 || p.x < -100 || p.x > canvas.width + 100 || p.y < -150) {
+      p.stocks--;
+      p.damage = 0;
+      p.x = id === 'host' ? 250 : 550;
+      p.y = 150;
+      p.vx = 0;
+      p.vy = 0;
+    }
+  }
+
+  function checkAttacks(attacker, defender) {
+    if (!attacker.isAttacking || defender.hitCooldown > 0) return;
+
+    // Attack Hitbox Offset in front of attacker
+    const hitbox = {
+      x: attacker.facing === 1 ? attacker.x + attacker.width : attacker.x - 30,
+      y: attacker.y,
+      width: 30,
+      height: attacker.height
+    };
+
+    // AABB Collision Detection
+    if (
+      hitbox.x < defender.x + defender.width &&
+      hitbox.x + hitbox.width > defender.x &&
+      hitbox.y < defender.y + defender.height &&
+      hitbox.y + hitbox.height > defender.y
+    ) {
+      defender.damage += 12; // Deal Damage %
+      defender.hitCooldown = 20; // Invincibility frames
+
+      // Knockback Scaling Formula
+      const knockback = 5 + (defender.damage * 0.18);
+      defender.vx = attacker.facing * knockback;
+      defender.vy = -knockback * 0.6;
+    }
+  }
+
+  function render() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+    // Draw Main Floating Stage
+    ctx.fillStyle = '#22222e';
+    ctx.fillRect(STAGE.x, STAGE.y, STAGE.width, STAGE.height);
+    ctx.fillStyle = '#ff3366';
+    ctx.fillRect(STAGE.x, STAGE.y, STAGE.width, 4); // Top edge outline
+
+    // Draw Scoreboard / HUD
+    drawHUD('Host', gameState.players.host, 120);
+    drawHUD('Client', gameState.players.client, canvas.width - 220);
+
+    // Draw Players
+    for (let id in gameState.players) {
+      const p = gameState.players[id];
+
+      ctx.save();
+
+      // Flash when invulnerable / hit
+      if (p.hitCooldown % 4 > 2) ctx.globalAlpha = 0.4;
+
+      // Body
+      ctx.fillStyle = p.color;
+      ctx.fillRect(p.x, p.y, p.width, p.height);
+
+      // Facing Direction / Visor
+      ctx.fillStyle = '#ffffff';
+      const visorX = p.facing === 1 ? p.x + p.width - 8 : p.x + 2;
+      ctx.fillRect(visorX, p.y + 8, 6, 8);
+
+      // Render Attack Punch
+      if (p.isAttacking) {
+        ctx.fillStyle = '#ffee55';
+        const punchX = p.facing === 1 ? p.x + p.width : p.x - 25;
+        ctx.fillRect(punchX, p.y + 10, 25, 14);
+      }
+
+      // Render Dash Trail
+      if (p.isDashing) {
+        ctx.fillStyle = p.color;
+        ctx.globalAlpha = 0.3;
+        ctx.fillRect(p.x - (p.vx * 2), p.y, p.width, p.height);
+      }
+
+      ctx.restore();
+    }
+  }
+
+  function drawHUD(label, player, x) {
+    ctx.fillStyle = '#ffffff';
+    ctx.font = '14px system-ui';
+    ctx.fillText(`${label}`, x, 30);
+
+    // Damage Percentage Display
+    ctx.font = 'bold 22px system-ui';
+    ctx.fillStyle = player.damage > 80 ? '#ff3333' : '#ffffff';
+    ctx.fillText(`${player.damage}%`, x, 55);
+
+    // Stock Counter Icons
+    ctx.fillStyle = player.color;
+    for (let i = 0; i < player.stocks; i++) {
+      ctx.fillRect(x + (i * 18), 65, 12, 12);
+    }
+  }
+</script>
+</body>
+</html>
