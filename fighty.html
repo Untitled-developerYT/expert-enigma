@@ -427,7 +427,7 @@ function sim(dt,now){
    let tg=null,bd=140;for(const r of state.raiders)if(r.o!==w.o){const d=Math.hypot(r.x-w.x,r.y-w.y);if(d<bd){bd=d;tg=r;}}if(tg)tg.hp-=18*k;continue;}
   if(w.go){if(step(w,w.go.x,w.go.y,90*k))w.go=null;continue;}
   if(w.st==='back'){if(step(w,(K.c+.5)*CELL,(K.r+.5)*CELL,90*k)){state.res[w.o][w.ct]+=w.k;w.k=0;w.st='go';}continue;}
-  let n=state.nodes.find(n=>n.id===w.tg);if(!n){let bd=1e9;for(const q of state.nodes)if(q.t==w.pt){const d=Math.hypot(w.x-q.c*CELL,w.y-q.r*CELL);if(d<bd){bd=d;n=q;}}w.tg=n?n.id:null;}
+  let n=state.nodes.find(n=>n.id===w.tg);if(!n){let bd=1e9;for(const q of state.nodes)if(q.t===w.pt){const d=Math.hypot(w.x-q.c*CELL,w.y-q.r*CELL);if(d<bd){bd=d;n=q;}}w.tg=n?n.id:null;}
   if(!n)continue;
   if(step(w,(n.c+.5)*CELL,(n.r+.5)*CELL,90*k)){w.tm+=dt;if(w.tm>1400){const mult=state.research.axes?1.25:1,t=Math.min(6,n.a*mult);n.a-=t;w.k=t;w.ct=n.t;w.tm=0;w.st='back';worldDirty=true;}}}
  state.nodes=state.nodes.filter(n=>n.a>0);
